@@ -1,50 +1,51 @@
-import {Schema, model} from "mongoose";
+import { Schema, model } from 'mongoose';
 
-const user_Schema=new Schema({
+const userSchema = new Schema(
+  {
     userName: {
-        type:String,
-        required:[true, 'User Name is required'],
-        trim:true,
-        minLength:2,
-        maxLength:50,
+      type:      String,
+      required:  [true, 'Username is required'],
+      unique:    true,        
+      trim:      true,
+      minlength: 2,          
+      maxlength: 50,
     },
     fullName: {
-        type:String,
-        required:[true, 'Full Name is required'],
-        trim:true,
-        minLength:2,
-        maxLength:50,
+      type:      String,
+      required:  [true, 'Full name is required'],
+      trim:      true,
+      minlength: 2,
+      maxlength: 50,
     },
-    email:{
-        type:String,
-        required:[true, 'User email is required'],
-        unique:true,
-        trim: true,
-        lowercase: true,
-        match: [/\S+@\S+\.\S+/, 'Please fill a valid email address'],
+    email: {
+      type:      String,
+      required:  [true, 'Email is required'],
+      unique:    true,
+      trim:      true,
+      lowercase: true,
+      match:     [/\S+@\S+\.\S+/, 'Please enter a valid email address'],
     },
-    password:{
-        type:String,
-        required:[true, 'User Password is required'],
-        minLength:6,
+    password: {
+      type:      String,
+      required:  [true, 'Password is required'],
+      minlength: 6,
     },
-    avatar: { type: String },
+    avatar: { type: String, default: '' },
+
     accountType: {
-        type: String,
-        required: [true, 'Account type required'],
-            enum: {
-                values: ['reader', 'writer', 'admin'],
-                message: 'Invalid account type'
-        }
+      type:     String,
+      required: [true, 'Account type is required'],
+      enum: {
+        values:  ['farmer', 'grocer', 'buyer', 'admin'],
+        message: 'Invalid account type',
+      },
     },
-    refreshToken:{type: String, default:null, select:false},
-    lastLogin:{type:Date, default:Date.now},
-    isActive:{type:Boolean, default: true},
- 
-},{
-    timestamps:true,
-    
-});
 
+    refreshToken: { type: String,  default: null,      select: false },
+    lastLogin:    { type: Date,    default: Date.now },
+    isActive:     { type: Boolean, default: true },
+  },
+  { timestamps: true },
+);
 
-export default model('userModel', user_Schema,'user');
+export default model('User', userSchema, 'users');

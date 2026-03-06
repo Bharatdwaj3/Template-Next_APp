@@ -1,18 +1,24 @@
 import { NextRequest, NextResponse } from 'next/server';
+import mongoose  from 'mongoose';
 import Produce from '@/model/produce.model';
 import { getCurrentUser } from '@/lib/auth/currentUser';
+import { connectDB }      from '@/lib/db';
 import PERMISSIONS from '@/config/permissions.config';
 
 export async function GET(request: NextRequest, { params }: { params: { id: string } }) {
+  await connectDB();
+  if (!mongoose.Types.ObjectId.isValid(params.id)) {
+    return NextResponse.json({ success: false, message: 'Invalid ID' }, { status: 400 });
+  }
   try {
-    const produce = await produce.findById(params.id)
+    const produce = await Produce.findById(params.id)
       .populate('author', 'fullName userName avatar accountType');
 
-    if (!Produce) {
+    if (!produce) {
       return NextResponse.json({ message: 'Produce not found' }, { status: 404 });
     }
 
-    return NextResponse.json(Produce, { status: 200 });
+    return NextResponse.json(produce, { status: 200 });
   } catch (err) {
     console.error('Get Produce error:', err);
     return NextResponse.json({ message: 'Server error' }, { status: 500 });
@@ -21,10 +27,11 @@ export async function GET(request: NextRequest, { params }: { params: { id: stri
 
 export async function PUT(request: NextRequest, { params }: { params: { id: string } }) {
   const user = await getCurrentUser(request);
+  await connectDB();
   if (!user) return NextResponse.json({ message: 'Unauthorized' }, { status: 401 });
 
   const allowed = PERMISSIONS[user.accountType] || [];
-  if (!allowed.includes('update_Produce')) {
+  if (!allowed.includes('update_produce')) {
     return NextResponse.json({ message: 'Forbidden' }, { status: 403 });
   }
 
@@ -64,6 +71,7 @@ export async function PUT(request: NextRequest, { params }: { params: { id: stri
 }
 
 export async function DELETE(request: NextRequest, { params }: { params: { id: string } }) {
+  await connectDB();
   const user = await getCurrentUser(request);
   if (!user) return NextResponse.json({ message: 'Unauthorized' }, { status: 401 });
 
@@ -77,8 +85,7 @@ export async function DELETE(request: NextRequest, { params }: { params: { id: s
     if (!deleted) {
       return NextResponse.json({ message: 'Produce not found' }, { status: 404 });
     }
-
-
+    
     return NextResponse.json({ message: 'Produce deleted successfully' }, { status: 200 });
   } catch (err) {
     console.error('Delete Produce error:', err);

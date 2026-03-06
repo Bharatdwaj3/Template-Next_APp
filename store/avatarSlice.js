@@ -1,6 +1,30 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import api from '../util/api.js';
 
+export interface NerthusUser {
+  id:          string;
+  userName:    string;
+  fullName:    string;
+  email:       string;
+  accountType: 'buyer' | 'farmer' | 'grocer';
+  avatar:      string | null;
+  isActive:    boolean;
+  lastLogin:   string;
+  createdAt:   string;
+}
+
+interface AvatarState {
+  user:    NerthusUser | null;
+  loading: boolean;
+  error:   string | null;
+}
+
+const initialState: AvatarState = {
+  user:    null,
+  loading: false,
+  error:   null,
+};
+
 export const fetchUser = createAsyncThunk(
   'avatar/fetchUser',
   async (_, { rejectWithValue }) => {

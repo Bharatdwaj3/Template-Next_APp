@@ -3,9 +3,11 @@ import mongoose from 'mongoose';
 import Grocer from '@/model/grocer.model';
 import User from '@/model/user.model';
 import { getCurrentUser } from "@/lib/auth/currentUser";
+import { connectDB }      from '@/lib/db';
 import PERMISSIONS from "@/config/permissions.config";
 
 export async function GET(request: NextRequest, {params}:{params:[id: string]}){
+    await connectDB();
     const user = await getCurrentUser(request);
     if(!user) return NextResponse.json(
         {
@@ -45,13 +47,14 @@ export async function GET(request: NextRequest, {params}:{params:[id: string]}){
         
 
     }catch(err){
-        console.log(err);
+        console.log('Get grocer error',err);
         return NextResponse.json({message: 'Server error'},{status: 500});
     }
 
 }
 
 export async function DELETE(request: NextRequest, {params}:{params: {id: string}}){
+    await connectDB(); 
     const user = await getCurrentUser(request);
     if(!user) return NextResponse.json({message: 'Unauthorized'},{status: 401});
     const allowed = PERMISSIONS[user.accountType] || [];
@@ -64,6 +67,7 @@ export async function DELETE(request: NextRequest, {params}:{params: {id: string
             return NextResponse.json({message: 'Grocer not found'},{status: 404});
         }
         return NextResponse.json({
+            success: true,
             message: 'Grocer deleted successfully',
             deletedGrocerId: deleted._id
         },{status: 200});

@@ -1,9 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
 import Farmer from "@/model/farmer.model";
 import { getCurrentUser } from "@/lib/auth/currentUser";
+import { connectDB }      from '@/lib/db';
 import PERMISSIONS from "@/config/permissions.config";
 
 export async function GET(request: NextRequest){
+    await connectDB();
     const user=await getCurrentUser(request);
     if(!user){
         return NextResponse.json({message: 'Unauthorized'},{status: 401});
@@ -15,9 +17,9 @@ export async function GET(request: NextRequest){
     }
     try{
         const farmers  = await Farmer.find({}).lean();
-        return NextResponse.json(farmers,{status: 200});    
+        return NextResponse.json({success: true, farmers}, {status: 200});    
     }catch(err){
-        console.log(err);
+        console.log('Get Farmers error: ',err);
         return NextResponse.json({ message: 'Server error' }, { status: 500 });
     }
 }

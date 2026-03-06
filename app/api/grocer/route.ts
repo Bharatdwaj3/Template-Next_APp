@@ -1,9 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
 import Grocer from '@/model/grocer.model'
+import { connectDB }      from '@/lib/db';
 import PERMISSIONS from '@/config/permissions.config';
 import { getCurrentUser } from '@/lib/auth/currentUser';
 
 export async function GET(request: NextRequest){
+    await connectDB();
     const user=await getCurrentUser(request);
         if(!user) return NextResponse.json({
             message: 'Unathorized'
@@ -22,7 +24,8 @@ export async function GET(request: NextRequest){
                 status: 403
             }
         );
-        try{
+    }
+     try{
             const grocers=await Grocer.find({}).lean();
             return NextResponse.json(grocers,{
                 status: 200
@@ -30,5 +33,4 @@ export async function GET(request: NextRequest){
         }catch(err){
             return NextResponse.json({message: 'Server Error',err},{status: 500});
         }
-    }
 }

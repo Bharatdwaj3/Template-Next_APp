@@ -1,16 +1,21 @@
 import { NextRequest, NextResponse } from "next/server";
 import Farmer from '@/model/farmer.model';
 import { getCurrentUser } from "@/lib/auth/currentUser";
+import { connectDB }      from '@/lib/db';
 import PERMISSIONS from "@/config/permissions.config";
 
 export async function PUT(request:NextRequest, {params}:{params:{id:string}}){
+    await connectDB();
+
     const user=await getCurrentUser(request);
-    if(!user) return NextResponse.json({message: 'Unathorized'},{status:401});
+    if(!user) return NextResponse.json({message: 'Unauthorized'},{status:401});
+    
     const allowedRoles=['farmer', 'admin'];
     if(!allowedRoles.includes(user.accountType)){
         return NextResponse.json({message: 'Forbidden'},{status: 403});
     }
-    if(!PERMISSIONS[user.acccountType]?.includes('update_writer')){
+
+    if(!PERMISSIONS[user.acccountType]?.includes('update_farmer')){
         return NextResponse.json({message: 'Forbidden'},{status: 403});
     }
     if(user.id!==params.id&&user.accountType!=='admin'){
@@ -19,16 +24,16 @@ export async function PUT(request:NextRequest, {params}:{params:{id:string}}){
     try{
         const formData=await request.formData();
         const bio=formData.get('bio') as string;
-        const intrests=formData.getAll('intrests') as string[];
+        const intrests=formData.getAll('interests') as string[];
         const image=formData.get('image') as File | null;
 
-        const updateData: any={};
+        const updateData: Record<string, unknown>={};
         if(bio) updateData.bio=bio;
         if(intrests?.length) updateData.intrests=intrests;
         if (image && image.size > 0) {
       updateData.mediaUrl = 'https://placeholder.com/uploaded.jpg';
     }
-    const updated=await Farmer.findoneAndUpdate(
+    const updated=await Farmer.findOneAndUpdate(
         {userId: params.id},
         updateData,
         {new : true, runValidators: true}
@@ -36,6 +41,7 @@ export async function PUT(request:NextRequest, {params}:{params:{id:string}}){
     if(!updated){
         return NextResponse.json({message: 'Profile not found'},{status : 404});
     }
+    return NextResponse.json({ success: true, farmer: updated }); 
     }catch(err){
         console.log(err);
         return NextResponse.json({message:'Server error'},{status: 500})

@@ -1,5 +1,4 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-import api from '../util/api.js';
 
 export interface NerthusUser {
   id:          string;
@@ -29,37 +28,45 @@ export const fetchUser = createAsyncThunk(
   'avatar/fetchUser',
   async (_, { rejectWithValue }) => {
     try {
-      const res = await api.get('/user/profile');
-      return res.data.user;
-    } catch (err) {
-      return rejectWithValue(err.response?.data?.message || 'Failed to load user');
+      const res = await fetch('api/auth/profile');
+      if(res.status===401){
+        return rejectWithValue('Not Authenticated');
+      }
+
+      const data=await res.json();
+
+      if(!data.success){
+        return rejectWithValue(data.message ?? 'Failed to load user');
+      }
+    } catch{
+      return rejectWithValue('Network error. Could not load profile');
     }
   }
 );
 
 const avatarSlice = createSlice({
   name: 'avatar',
-  initialState: {
-    user: null,
-    loading: false,
-    error: null,
-  },
+  initialState,
   reducers: {
     clearUser: (state) => {
       state.user = null;
       state.error = null;
+      state.loading = false;
     },
   },
   extraReducers: (builder) => {
     builder
-      .addCase(fetchUser.pending, (state) => { state.loading = true; })
+      .addCase(fetchUser.pending, (state) => {
+         state.loading = true; 
+         state.error   = null;
+      })
       .addCase(fetchUser.fulfilled, (state, action) => {
         state.loading = false;
         state.user = action.payload;
       })
       .addCase(fetchUser.rejected, (state, action) => {
         state.loading = false;
-        state.error = action.payload;
+        state.error = action.payload ?? 'Unknown error';
         state.user = null;
       });
   },

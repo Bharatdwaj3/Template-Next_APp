@@ -1,41 +1,48 @@
+'use client';
+
 import { useEffect, useState } from 'react';
-import { useSelector, useDispatch } from 'react-redux';
-import { useNavigate } from 'react-router-dom';
-import { fetchUser, clearUser } from '../store/avatarSlice';
-import api from '../util/api';
+import { useRouter } from 'next/navigation';
+import { useAppDispatch, useAppSelector } from '@/store/hooks';
+import { fetchUser, clearUser } from '@/store/avatarSlice';
+
 
 export function useNavbar() {
-  const dispatch = useDispatch();
-  const navigate = useNavigate();
-  const { user, loading } = useSelector((state) => state.avatar);
+  const dispatch = useAppDispatch();
+  const router   = useRouter();
 
-  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const { user, loading } = useAppSelector((state) => state.avatar);
+
+  const [isMenuOpen,   setIsMenuOpen]   = useState(false);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
-  const [searchQuery, setSearchQuery] = useState('');
+  const [searchQuery,  setSearchQuery]  = useState('');
 
   useEffect(() => {
-    if (localStorage.getItem('accessToken') || document.cookie.includes('accessToken')) {
+    if (!user) {
       dispatch(fetchUser());
     }
-  }, [dispatch]);
+  }, [dispatch, user]);
 
   const handleLogout = async () => {
     try {
-      await api.post('/user/logout');
+      await fetch('/api/auth/logout', { method: 'POST' });
       dispatch(clearUser());
       setIsMenuOpen(false);
-      navigate('/login');
-    } catch (err) {
-      console.error('Logout failed:', err);
+      router.push('/features/auth/login');
+    } catch {
+      console.error('Logout failed');
     }
   };
 
-  const getInitial = (name) => (name ? name[0].toUpperCase() : 'U');
+  const handleSearch = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (searchQuery.trim()) {
+      router.push(`/features/produce?search=${encodeURIComponent(searchQuery.trim())}`);
+      setIsSearchOpen(false);
+      setSearchQuery('');
+    }
+  };
 
-  const closeMenu = () => setIsMenuOpen(false);
-  const toggleMenu = () => setIsMenuOpen((prev) => !prev);
-  const toggleSearch = () => setIsSearchOpen((prev) => !prev);
-  const closeSearch = () => setIsSearchOpen(false);
+  const getInitial = (name: string) => (name ? name[0].toUpperCase() : 'U');
 
   return {
     user,
@@ -45,10 +52,11 @@ export function useNavbar() {
     searchQuery,
     setSearchQuery,
     handleLogout,
+    handleSearch,
     getInitial,
-    closeMenu,
-    toggleMenu,
-    toggleSearch,
-    closeSearch,
+    closeMenu:    () => setIsMenuOpen(false),
+    toggleMenu:   () => setIsMenuOpen((p) => !p),
+    toggleSearch: () => setIsSearchOpen((p) => !p),
+    closeSearch:  () => setIsSearchOpen(false),
   };
 }

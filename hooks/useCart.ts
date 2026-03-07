@@ -1,7 +1,18 @@
 'use client'
 
 import { useState } from "react"
-import type {Produce} from '@/components/ProduceCard';
+//import type {Produce} from '@/components/ProduceCard';
+
+export interface Produce {
+  id:       string;
+  name:     string;
+  price:    number;
+  unit:     string;
+  grower:   string;
+  location: string;
+  rating:   number;
+  img:      string;
+}
 
 export interface CartItem extends Produce{
     quantity: number;

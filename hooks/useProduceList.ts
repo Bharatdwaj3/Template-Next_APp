@@ -16,7 +16,7 @@ interface Produce {
 export function useProduceList(ids: string[], enabled = true) {
   const [produce,  setProduce]  = useState<Produce[]>([]);
   const [fetching, setFetching] = useState(false);
-  const stableIds = useMemo(() => ids, [JSON.stringify(ids)]);
+  const stableIds = useMemo(() => ids, [ids]);
 
   useEffect(() => {
     if (!enabled || stableIds.length === 0) {

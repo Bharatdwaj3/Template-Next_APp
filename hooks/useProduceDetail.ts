@@ -3,7 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAppDispatch } from '@/store/hooks';
-import { markProduceViewed } from '@/store/contentSlice';
+import { markProduceVisited } from '@/store/contentSlice';
 
 interface Produce {
   id:          string;
@@ -43,7 +43,7 @@ export function useProduceDetail(id: string) {
         }
 
         setProduce(data.produce);
-        dispatch(markProduceViewed(id));
+        dispatch(markProduceVisited(id));
       } catch {
         router.replace('/features/produce');
       } finally {

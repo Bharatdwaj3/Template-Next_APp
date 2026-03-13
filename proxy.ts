@@ -35,10 +35,8 @@ function isAuthRoute(pathname: string) {
   return AUTH_ROUTES.some((r) => pathname.startsWith(r));
 }
 
-
-export async function middleware(request: NextRequest) {
+export async function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
-
   const accessToken  = request.cookies.get('accessToken')?.value;
   const refreshToken = request.cookies.get('refreshToken')?.value;
 
@@ -68,7 +66,7 @@ export async function middleware(request: NextRequest) {
       new URL('/api/auth/refresh', request.url).toString(),
       {
         method:  'POST',
-        headers: { cookie: `refreshToken=${refreshToken}` }, 
+        headers: { cookie: `refreshToken=${refreshToken}` },
         signal:  controller.signal,
       },
     );
@@ -76,29 +74,25 @@ export async function middleware(request: NextRequest) {
     clearTimeout(timeoutId);
 
     if (refreshRes.ok) {
-      const response = NextResponse.next();
-
+      const response  = NextResponse.next();
       const setCookie = refreshRes.headers.get('set-cookie');
       if (setCookie) {
         response.headers.set('set-cookie', setCookie);
       }
-
       if (isGuestOnlyRoute(pathname)) {
         return NextResponse.redirect(new URL('/features/produce', request.url));
       }
-
       return response;
     }
 
-     if (isProtectedRoute(pathname)) {
+    if (isProtectedRoute(pathname)) {
       const res = NextResponse.redirect(getLoginUrl(request, pathname));
-      res.cookies.delete('accessToken');   
+      res.cookies.delete('accessToken');
       res.cookies.delete('refreshToken');
       return res;
     }
 
     return NextResponse.next();
-
   } catch {
     if (isProtectedRoute(pathname)) {
       return NextResponse.redirect(getLoginUrl(request, pathname));
@@ -106,6 +100,7 @@ export async function middleware(request: NextRequest) {
     return NextResponse.next();
   }
 }
+
 export const config = {
   matcher: [
     '/features/:path*',

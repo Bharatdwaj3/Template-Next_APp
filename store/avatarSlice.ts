@@ -28,17 +28,16 @@ export const fetchUser = createAsyncThunk(
   'avatar/fetchUser',
   async (_, { rejectWithValue }) => {
     try {
-      const res = await fetch('api/auth/profile');
-      if(res.status===401){
-        return rejectWithValue('Not Authenticated');
+      const res = await fetch('/api/auth/profile');
+      if (res.status === 401) {
+        return rejectWithValue('Not authenticated');
       }
-
-      const data=await res.json();
-
-      if(!data.success){
+      const data = await res.json();
+      if (!data.success) {
         return rejectWithValue(data.message ?? 'Failed to load user');
       }
-    } catch{
+      return data.user as NerthusUser;
+    } catch {
       return rejectWithValue('Network error. Could not load profile');
     }
   }
@@ -49,25 +48,25 @@ const avatarSlice = createSlice({
   initialState,
   reducers: {
     clearUser: (state) => {
-      state.user = null;
-      state.error = null;
+      state.user    = null;
+      state.error   = null;
       state.loading = false;
     },
   },
   extraReducers: (builder) => {
     builder
       .addCase(fetchUser.pending, (state) => {
-         state.loading = true; 
-         state.error   = null;
+        state.loading = true;
+        state.error   = null;
       })
       .addCase(fetchUser.fulfilled, (state, action) => {
         state.loading = false;
-        state.user = action.payload;
+        state.user    = action.payload;
       })
       .addCase(fetchUser.rejected, (state, action) => {
         state.loading = false;
-        state.error = action.payload ?? 'Unknown error';
-        state.user = null;
+        state.error   = action.payload as string ?? 'Unknown error';
+        state.user    = null;
       });
   },
 });

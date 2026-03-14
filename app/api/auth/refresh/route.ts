@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
-import { refreshTokenHandler } from '@/middleware/token.middleware';
+import { refreshTokenHandler } from '@/lib/auth';
 
-export async function POST(request: unknown) {
+export async function POST(request: Request) {
   return refreshTokenHandler(request, NextResponse.next());
 }

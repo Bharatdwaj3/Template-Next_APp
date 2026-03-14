@@ -23,10 +23,10 @@ interface ContentState {
 }
 
 const initialState: ContentState = {
-  savedProduce: fromStorage<string[]>('nerthus_savedProduce', []),
-  viewedProduce: fromStorage<string[]>('nerthus_viewedProduce', []),
+  savedProduce:     fromStorage<string[]>('nerthus_savedProduce', []),
+  viewedProduce:    fromStorage<string[]>('nerthus_viewedProduce', []),
   selectedCategory: 'all',
-  searchQuery: '',
+  searchQuery:      '',
 };
 
 const contentSlice = createSlice({
@@ -34,55 +34,51 @@ const contentSlice = createSlice({
   initialState,
   reducers: {
     toggleSavedProduce: (state, action: PayloadAction<string>) => {
-      const id = action.payload;
+      const id    = action.payload;
       const index = state.savedProduce.indexOf(id);
-      
       if (index > -1) {
         state.savedProduce.splice(index, 1);
       } else {
         state.savedProduce.push(id);
       }
-      
       toStorage('nerthus_savedProduce', state.savedProduce);
     },
-    
-      markProduceVisited: (state, action: PayloadAction<string>) => {
+
+    markProduceVisited: (state, action: PayloadAction<string>) => {
       const id = action.payload;
-      
-      if (!state.visitedProduce.includes(id)) {
-        state.visitedProduce.unshift(id);
+      if (!state.viewedProduce.includes(id)) {
+        state.viewedProduce.unshift(id);
       }
       toStorage('nerthus_viewedProduce', state.viewedProduce);
     },
 
     clearViewHistory: (state) => {
-      state.visitedProduce = [];
+      state.viewedProduce = [];
       toStorage('nerthus_viewedProduce', []);
     },
 
     setCategory: (state, action: PayloadAction<string>) => {
       state.selectedCategory = action.payload;
     },
-    
-    setSearchQuery: (state, action:PayloadAction<string>) => {
+
+    setSearchQuery: (state, action: PayloadAction<string>) => {
       state.searchQuery = action.payload;
     },
-    
+
     clearSavedProduce: (state) => {
       state.savedProduce = [];
-      toStorage('nerthus_savedProduce', [])
+      toStorage('nerthus_savedProduce', []);
     },
   },
 });
 
-export const { 
-  toggleSavedProduce, 
+export const {
+  toggleSavedProduce,
   markProduceVisited,
   clearViewHistory,
-  setCategory, 
-  setSearchQuery, 
-  clearSavedProduce 
+  setCategory,
+  setSearchQuery,
+  clearSavedProduce,
 } = contentSlice.actions;
-
 
 export default contentSlice.reducer;

@@ -15,7 +15,7 @@ export const Hero = () => {
 
       <div className="absolute right-0 top-0 bottom-0 w-32 flex items-center justify-center overflow-hidden pointer-events-none z-0">
         <span
-          className="text-[9rem] font-black text-[#1a3d2b]/[0.04] uppercase select-none whitespace-nowrap"
+          className="text-[9rem] font-black text-[#1a3d2b]/4 uppercase select-none whitespace-nowrap"
           style={{ writingMode: 'vertical-rl', letterSpacing: '-0.05em' }}
         >
           Nerthus
@@ -26,9 +26,9 @@ export const Hero = () => {
         initial={{ opacity: 0, x: -24 }}
         animate={{ opacity: 1, x: 0 }}
         transition={{ duration: 1.0 }}
-        className="w-full lg:w-[42%] lg:min-w-[400px] flex flex-col justify-center px-8 lg:px-24 z-20 bg-[#1a3d2b] relative"
+        className="w-full lg:w-[42%] lg:min-w-100 flex flex-col justify-center px-8 lg:px-24 z-20 bg-[#1a3d2b] relative pt-20"
       >
-        <div className="absolute top-0 left-0 right-0 h-[3px] bg-[#e8c84a]" />
+        <div className="absolute top-0 left-0 right-0 h-0.75 bg-[#e8c84a]" />
 
         <motion.p
           initial={{ opacity: 0, y: -8 }}
@@ -53,7 +53,7 @@ export const Hero = () => {
           From soil to table - unmediated
         </p>
 
-        <p className="text-base text-[#f5f0e8]/[0.68] leading-relaxed mb-10 font-light max-w-sm">
+        <p className="text-base text-[#f5f0e8]/68 leading-relaxed mb-10 font-light max-w-sm">
           A living marketplace where growers share harvest and families find
           nourishment. No algorithms. No middlemen. Just the
           <span className="text-[#e8c84a] font-medium ml-1">earth&apos;s honest yield</span>.

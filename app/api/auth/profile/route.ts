@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import User from '@/models/user.model';
+import User from '@/model/user.model';
 import { getAuthenticatedUser } from '@/lib/auth';
 
 

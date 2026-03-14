@@ -18,7 +18,7 @@ const Navbar = () => {
 
   if (loading) {
     return (
-      <nav className="fixed top-0 left-0 right-0 z-50 bg-[#f5f0e8]/90 backdrop-blur-md border-b border-[#d4c9b0]">
+      <nav className="fixed top-0 left-0 right-0 z-50 bg-[#f5f0e8] backdrop-blur-md border-b border-[#d4c9b0]">
         <div className="max-w-7xl mx-auto px-6 h-20 flex items-center justify-center">
           <div className="w-5 h-5 border-2 border-[#1a3d2b] border-t-transparent rounded-full animate-spin" />
         </div>
@@ -27,7 +27,7 @@ const Navbar = () => {
   }
 
   return (
-    <nav className="fixed top-0 left-0 right-0 z-50 bg-[#f5f0e8]/95 backdrop-blur-md border-b border-[#d4c9b0]">
+    <nav className="fixed top-0 left-0 right-0 z-50 bg-[#f5f0e8] backdrop-blur-md border-b border-[#d4c9b0]">
       <div className="max-w-7xl mx-auto px-6">
         <div className="flex items-center justify-between h-20">
 

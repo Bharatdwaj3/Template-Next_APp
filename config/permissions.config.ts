@@ -1,21 +1,30 @@
-const PERMISSIONS = {
+const PERMISSIONS: Record<string, string[]> = {
   admin: [
-    'list_contents', 'manage_users', 'view_users', 'delete_user',
-    'view_writers', 'list_readers', 'create_content', 'view_contents',
-    'update_product', 'delete_product', 'delete_writer', 'delete_reader',
-    'update_writer', 'delete_account', 'view_readers', 'view_reader',
-    'show_Content', 'view_self', 'update_self', 'view-self'
+    'list_farmers',   'list_grocers',   'list_buyers',
+    'view_farmer',    'view_grocer',    'view_buyer',
+    'delete_farmer',  'delete_grocer',  'delete_buyer',
+    'update_farmer',  'update_grocer',  'update_buyer',
+    'view_farmers',   'view_grocers',   'view_buyers',
+    'view_produce',   'create_produce', 'update_produce', 'delete_produce',
+    'view_self',      'update_self',    'delete_account',
+    'manage_users',
   ],
-  writer: [
-    'list_readers', 'create_content', 'view_contents', 'update_content',
-    'delete_content', 'delete_writer', 'update_writer', 'show_Content',
-    'view-self', 'view_writer', 'list_contents', 'view_readers', 'view_writers'
+  farmer: [
+    'view_self',      'update_self',    'update_farmer',
+    'create_produce', 'update_produce', 'delete_produce',
+    'view_produce',   'view_farmers',   'view_grocers',
+    'list_grocers',
   ],
-  reader: [
-    'list_contents', 'list_readers', 'view_contents', 'create_content',
-    'update_content', 'delete_account', 'delete_reader', 'view_reader',
-    'show_Content', 'view_writers', 'update_reader'
-  ]
+  grocer: [
+    'view_self',      'update_self',    'update_grocer',
+    'list_grocers',   'view_grocers',   'view_farmers',
+    'list_farmers',   'view_produce',
+  ],
+  buyer: [
+    'view_self',      'update_self',    'update_buyer',
+    'view_produce',   'view_farmers',   'list_farmers',
+    'view_grocers',   'list_grocers',
+  ],
 };
 
 export default PERMISSIONS;

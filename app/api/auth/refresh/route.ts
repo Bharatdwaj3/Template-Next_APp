@@ -1,6 +1,7 @@
-import { NextResponse } from 'next/server';
 import { refreshTokenHandler } from '@/lib/auth';
+import { connectDB } from '@/lib/db';
 
-export async function POST(request: Request) {
-  return refreshTokenHandler(request, NextResponse.next());
+export async function POST() {
+  await connectDB();
+  return refreshTokenHandler();
 }

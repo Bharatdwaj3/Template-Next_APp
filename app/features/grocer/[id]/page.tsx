@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { use, useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import {
@@ -34,23 +34,25 @@ const STATUS_STYLES: Record<string, string> = {
   Processing: 'bg-[#e8c84a]/20 text-[#8a6a00]',
 };
 
-export default function GrocerProfilePage({ params }: { params: { id: string } }) {
+export default function GrocerProfilePage({ params }: { params: Promise<{ id: string }> }) {
   const router      = useRouter();
   const dispatch    = useAppDispatch();
   const currentUser = useAppSelector((s) => s.avatar.user);
+
+  const { id } = use(params); // ✅ Next.js 15 — params is a Promise
 
   const [grocer,     setGrocer]     = useState<GrocerProfile | null>(null);
   const [dash,       setDash]       = useState<DashboardData | null>(null);
   const [loading,    setLoading]    = useState(true);
   const [loggingOut, setLoggingOut] = useState(false);
 
-  const { isFollowing, toggle } = useFollow('grocer', params.id);
-  const isOwner = currentUser?.id === params.id;
+  const { isFollowing, toggle } = useFollow('grocer', id);
+  const isOwner = currentUser?.id === id;
 
   useEffect(() => {
     const load = async () => {
       try {
-        const res  = await fetch(`/api/grocer/${params.id}`);
+        const res  = await fetch(`/api/grocer/${id}`);
         const data = await res.json();
 
         if (res.status === 401) { router.push('/features/auth/login'); return; }
@@ -59,7 +61,7 @@ export default function GrocerProfilePage({ params }: { params: { id: string } }
 
         setGrocer(data.grocer);
 
-        if (currentUser?.id === params.id) {
+        if (isOwner) {
           const dashRes  = await fetch('/api/grocer/dashboard');
           const dashData = await dashRes.json();
           if (dashData.success) setDash(dashData.dashboard);
@@ -71,7 +73,7 @@ export default function GrocerProfilePage({ params }: { params: { id: string } }
       }
     };
     load();
-  }, [params.id, router, currentUser?.id]);
+  }, [id, router, isOwner]);
 
   const handleLogout = async () => {
     setLoggingOut(true);
@@ -167,7 +169,6 @@ export default function GrocerProfilePage({ params }: { params: { id: string } }
           )}
         </div>
 
-    
         <div className="grid grid-cols-3 gap-4 mb-10">
           {(isOwner && dash?.stats
             ? dash.stats.slice(0, 3).map((s) => ({ label: s.label, val: s.value }))
@@ -230,7 +231,6 @@ export default function GrocerProfilePage({ params }: { params: { id: string } }
 
         {isOwner && dash && (
           <div className="grid grid-cols-12 gap-6 mb-16">
-
             <div className="col-span-8 bg-white border border-[#d4c9b0] rounded-2xl overflow-hidden">
               <div className="bg-[#1a3d2b] px-6 py-4">
                 <p className="text-[9px] font-black uppercase tracking-[0.4em] text-[#e8c84a]/50">Latest</p>
@@ -275,7 +275,6 @@ export default function GrocerProfilePage({ params }: { params: { id: string } }
             </div>
           </div>
         )}
-
       </div>
     </div>
   );

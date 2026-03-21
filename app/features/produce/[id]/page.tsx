@@ -1,17 +1,19 @@
 'use client';
 
-import { useState } from 'react';
+import { use, useState } from 'react';
 import Link from 'next/link';
 import { Star, Leaf, ShoppingBasket, ArrowLeft, MapPin, Minus, Plus, Bookmark, BookmarkCheck } from 'lucide-react';
 import { useProduceDetail } from '@/hooks/useProduceDetail';
 import { useSavedProduce }  from '@/hooks/useSavedProduce';
 import { useCartContext }   from '@/hooks/useCartContext';
 
-export default function ProduceDetailPage({ params }: { params: { id: string } }) {
-  const { produce, loading }         = useProduceDetail(params.id);
-  const { isSaved, toggle: toggleSave } = useSavedProduce(params.id);
-  const { addToCart, setIsOpen }     = useCartContext();
-  const [qty, setQty]                = useState(1);
+export default function ProduceDetailPage({ params }: { params: Promise<{ id: string }> }) {
+  const { id } = use(params); 
+
+  const { produce, loading }            = useProduceDetail(id);
+  const { isSaved, toggle: toggleSave } = useSavedProduce(id);
+  const { addToCart, setIsOpen }        = useCartContext();
+  const [qty, setQty]                   = useState(1);
 
   if (loading) return (
     <div className="min-h-screen bg-[#f5f0e8] flex items-center justify-center pt-24">
@@ -37,7 +39,7 @@ export default function ProduceDetailPage({ params }: { params: { id: string } }
               <img src={produce.img} alt={produce.name} className="w-full h-full object-cover" />
               <div className="absolute top-0 left-0 right-0 h-[3px] bg-[#e8c84a]" />
               <div className="absolute top-4 left-4 flex flex-col gap-2">
-                {produce.isOrganic  && (
+                {produce.isOrganic && (
                   <span className="flex items-center gap-1 bg-[#1a3d2b] text-[#e8c84a] text-[9px] font-black uppercase tracking-widest px-3 py-1.5 rounded-full">
                     <Leaf size={9} /> Organic
                   </span>

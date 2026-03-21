@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { use, useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import {
@@ -52,23 +52,25 @@ function formatPrice(price: number) {
   return `₹${price.toLocaleString('en-IN')}`;
 }
 
-export default function FarmerProfilePage({ params }: { params: { id: string } }) {
+export default function FarmerProfilePage({ params }: { params: Promise<{ id: string }> }) {
   const router      = useRouter();
   const dispatch    = useAppDispatch();
   const currentUser = useAppSelector((s) => s.avatar.user);
+
+  const { id } = use(params); // ✅ Next.js 15 — params is a Promise
 
   const [farmer,     setFarmer]     = useState<FarmerProfile | null>(null);
   const [dash,       setDash]       = useState<DashboardData | null>(null);
   const [loading,    setLoading]    = useState(true);
   const [loggingOut, setLoggingOut] = useState(false);
 
-  const { isFollowing, toggle } = useFollow('farmer', params.id);
-  const isOwner = currentUser?.id === params.id;
+  const { isFollowing, toggle } = useFollow('farmer', id);
+  const isOwner = currentUser?.id === id;
 
   useEffect(() => {
     const load = async () => {
       try {
-        const res  = await fetch(`/api/farmer/${params.id}`);
+        const res  = await fetch(`/api/farmer/${id}`);
         const data = await res.json();
 
         if (res.status === 401) { router.push('/features/auth/login'); return; }
@@ -77,7 +79,7 @@ export default function FarmerProfilePage({ params }: { params: { id: string } }
 
         setFarmer(data.farmer);
 
-        if (currentUser?.id === params.id) {
+        if (isOwner) {
           const dashRes  = await fetch('/api/farmer/dashboard');
           const dashData = await dashRes.json();
           if (dashData.success) setDash(dashData.dashboard);
@@ -90,7 +92,7 @@ export default function FarmerProfilePage({ params }: { params: { id: string } }
       }
     };
     load();
-  }, [params.id, router, currentUser?.id]);
+  }, [id, router, isOwner]);
 
   const handleLogout = async () => {
     setLoggingOut(true);
@@ -125,7 +127,6 @@ export default function FarmerProfilePage({ params }: { params: { id: string } }
   return (
     <div className="min-h-screen bg-[#f5f0e8] pt-20">
 
-      {/* Cover */}
       <div className="relative w-full h-56 overflow-hidden">
         <img src={p.coverImg} alt={p.farmName} className="w-full h-full object-cover" />
         <div className="absolute inset-0 bg-[#1a3d2b]/60" />
@@ -156,7 +157,6 @@ export default function FarmerProfilePage({ params }: { params: { id: string } }
 
       <div className="max-w-5xl mx-auto px-6">
 
-        {/* Profile header */}
         <div className="relative -mt-14 mb-10 flex items-end gap-5">
           <div className="relative w-24 h-24 rounded-2xl overflow-hidden border-4 border-[#f5f0e8] shadow-xl flex-shrink-0">
             <img src={p.avatar} alt={farmer.fullName} className="w-full h-full object-cover" />
@@ -194,7 +194,6 @@ export default function FarmerProfilePage({ params }: { params: { id: string } }
           )}
         </div>
 
-        {/* Stats */}
         <div className="grid grid-cols-3 gap-4 mb-10">
           {(isOwner && dash?.stats
             ? dash.stats.slice(0, 3).map((s) => ({ label: s.label, val: s.value }))

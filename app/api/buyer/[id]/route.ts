@@ -5,19 +5,20 @@ import User from '@/model/user.model';
 import { getCurrentUser } from '@/lib/auth/currentUser';
 import { connectDB } from '@/lib/db';
 
-export async function GET(_req: NextRequest, { params }: { params: { id: string } }) {
+export async function GET(_req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   await connectDB();
+  const { id } = await params;  
   const currentUser = await getCurrentUser();
   if (!currentUser) return NextResponse.json({ message: 'Unauthorized' }, { status: 401 });
-  if (currentUser.id !== params.id) return NextResponse.json({ message: 'Forbidden' }, { status: 403 });
+  if (currentUser.id !== id) return NextResponse.json({ message: 'Forbidden' }, { status: 403 });
 
-  if (!mongoose.Types.ObjectId.isValid(params.id)) {
+  if (!mongoose.Types.ObjectId.isValid(id)) {
     return NextResponse.json({ message: 'Invalid ID' }, { status: 400 });
   }
 
   try {
     const [result] = await User.aggregate([
-      { $match: { _id: new mongoose.Types.ObjectId(params.id), accountType: 'buyer' } },
+      { $match: { _id: new mongoose.Types.ObjectId(id), accountType: 'buyer' } },
       {
         $lookup: {
           from:         'buyers',
@@ -52,15 +53,17 @@ export async function GET(_req: NextRequest, { params }: { params: { id: string 
   }
 }
 
-export async function DELETE(_req: NextRequest, { params }: { params: { id: string } }) {
+export async function DELETE(_req: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   await connectDB();
+  const { id } = await params;  
+
   const currentUser = await getCurrentUser();
   if (!currentUser) return NextResponse.json({ message: 'Unauthorized' }, { status: 401 });
-  if (currentUser.id !== params.id) return NextResponse.json({ message: 'Forbidden' }, { status: 403 });
+  if (currentUser.id !== id) return NextResponse.json({ message: 'Forbidden' }, { status: 403 });
 
   try {
-    await User.findByIdAndDelete(params.id);
-    await Buyer.findOneAndDelete({ userId: params.id });
+    await User.findByIdAndDelete(id);
+    await Buyer.findOneAndDelete({ userId: id });
     return NextResponse.json({ success: true, message: 'Account deleted' });
   } catch (err) {
     console.error('Delete buyer error:', err);

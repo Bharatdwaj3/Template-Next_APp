@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { use, useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
@@ -43,22 +43,23 @@ function formatDate(iso: string) {
   return new Date(iso).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' });
 }
 
-export default function BuyerProfilePage({ params }: { params: { id: string } }) {
+export default function BuyerProfilePage({ params }: { params: Promise<{ id: string }> }) {
   const router      = useRouter();
   const dispatch    = useAppDispatch();
   const currentUser = useAppSelector((s) => s.avatar.user);
+  const { id } = use(params);
 
   const [buyer,      setBuyer]      = useState<BuyerProfile | null>(null);
   const [dash,       setDash]       = useState<DashboardData | null>(null);
   const [loading,    setLoading]    = useState(true);
   const [loggingOut, setLoggingOut] = useState(false);
 
-  const isOwner = currentUser?.id === params.id;
+  const isOwner = currentUser?.id === id;
 
   useEffect(() => {
     const load = async () => {
       try {
-        const res  = await fetch(`/api/buyer/${params.id}`);
+        const res  = await fetch(`/api/buyer/${id}`);
         const data = await res.json();
 
         if (res.status === 401) { router.push('/features/auth/login'); return; }
@@ -80,7 +81,7 @@ export default function BuyerProfilePage({ params }: { params: { id: string } })
       }
     };
     load();
-  }, [params.id, router, isOwner]);
+  }, [id, router, isOwner]);
 
   const handleLogout = async () => {
     setLoggingOut(true);

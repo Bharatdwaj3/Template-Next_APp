@@ -1,5 +1,6 @@
 'use client';
-
+import { useState, useEffect } from 'react';
+import Image from 'next/image';
 import Link from 'next/link';
 import { Search, Menu, X, ShoppingBasket, Sprout } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -12,25 +13,22 @@ const Navbar = () => {
     setSearchQuery, handleLogout, getInitial,
     closeMenu, toggleMenu, toggleSearch, closeSearch,
   } = useNavbar();
-
+  
   const { items, setIsOpen: openCart } = useCartContext();
   const cartCount = items.reduce((sum, i) => sum + i.quantity, 0);
 
-  if (loading) {
-    return (
-      <nav className="fixed top-0 left-0 right-0 z-50 bg-[#f5f0e8] backdrop-blur-md border-b border-[#d4c9b0]">
-        <div className="max-w-7xl mx-auto px-6 h-20 flex items-center justify-center">
-          <div className="w-5 h-5 border-2 border-[#1a3d2b] border-t-transparent rounded-full animate-spin" />
-        </div>
-      </nav>
-    );
-  }
+  const [hasMounted, setHasMounted] = useState(false);
+  // eslint-disable-next-line react-hooks/set-state-in-effect
+  useEffect(() => { setHasMounted(true); }, []);
+
+  const shouldShowAuthenticatedUI = hasMounted && (user || loading);
+  const shouldShowGuestUI         = hasMounted && !user && !loading;
 
   return (
-    <nav className="fixed top-0 left-0 right-0 z-50 bg-[#f5f0e8] backdrop-blur-md border-b border-[#d4c9b0]">
-      <div className="max-w-7xl mx-auto px-6">
-        <div className="flex items-center justify-between h-20">
-
+  <nav className="sticky top-0 z-50 bg-[#f5f0e8]/95 backdrop-blur-md border-b border-[#d4c9b0]">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="flex items-center justify-between h-16">
+          
           <Link href="/" className="flex items-center gap-2 group">
             <Sprout className="w-5 h-5 text-[#1a3d2b] group-hover:text-[#e86c2a] transition-colors" />
             <span className="text-2xl font-black tracking-tight text-[#1a3d2b] group-hover:text-[#e86c2a] transition-colors uppercase italic">
@@ -39,19 +37,25 @@ const Navbar = () => {
           </Link>
 
           <div className="hidden md:flex items-center gap-8">
-            {['Explore', 'Growers', 'Produce', 'Stories'].map((item) => (
+            {[
+              { label: 'Explore', href: '/features/produce' },
+                { label: 'Farmers', href: '/features/farmer' },
+                { label: 'Produce', href: '/features/produce' },
+                { label: 'Sellers', href: '/features/grocer' },
+
+            ].map((item) => (
               <Link
-                key={item}
-                href={`/${item.toLowerCase()}`}
+                key={item.label}
+                href={item.href}
                 className="text-[11px] font-black uppercase tracking-widest text-[#4a5a4e] hover:text-[#1a3d2b] transition-colors border-b-2 border-transparent hover:border-[#1a3d2b] pb-0.5"
               >
-                {item}
+                {item.label}
               </Link>
             ))}
           </div>
 
           <div className="flex items-center gap-4">
-
+            
             <div className="hidden sm:flex items-center gap-2 px-4 py-2 bg-white/60 border border-[#d4c9b0] rounded-xl hover:border-[#1a3d2b]/40 transition-colors group">
               <Search size={16} className="text-[#8a9a8e] group-hover:text-[#1a3d2b] transition-colors" />
               <input
@@ -82,23 +86,33 @@ const Navbar = () => {
               )}
             </button>
 
-            {user ? (
+            {!hasMounted && (
+              <div className=" h-8 rounded-xl bg-[#1a3d2b]/10 animate-pulse" />
+            )}
+
+            {shouldShowAuthenticatedUI ? (
               <div className="relative">
                 <button
                   onClick={toggleMenu}
                   className="flex items-center gap-2.5 p-1.5 pr-4 rounded-xl hover:bg-[#1a3d2b]/5 transition-colors"
+                  disabled={loading && !user} 
                 >
                   <div className="w-8 h-8 rounded-full bg-[#1a3d2b] flex items-center justify-center font-black text-sm text-[#e8c84a]">
-                    {user.avatar
-                      ? <img src={user.avatar} alt={user.userName} className="w-full h-full rounded-full object-cover" />
-                      : getInitial(user.userName)
-                    }
+                    {loading && !user ? (
+                      <div className="w-4 h-4 border-2 border-[#e8c84a] border-t-transparent rounded-full animate-spin" />
+                    ) : user?.avatar ? (
+                      <Image src={user.avatar} alt={user.userName} width={32} height={32} className="rounded-full object-cover" />
+                    ) : (
+                      getInitial(user?.userName || 'U')
+                    )}
                   </div>
-                  <span className="hidden md:block text-sm font-bold text-[#1a3d2b]">{user.userName}</span>
+                  <span className="hidden md:block text-sm font-bold text-[#1a3d2b]">
+                    {loading && !user ? '...' : user?.userName}
+                  </span>
                 </button>
 
                 <AnimatePresence>
-                  {isMenuOpen && (
+                  {isMenuOpen && user && (
                     <>
                       <div className="fixed inset-0 z-40" onClick={closeMenu} />
                       <motion.div
@@ -113,9 +127,9 @@ const Navbar = () => {
                         </div>
                         <div className="py-2">
                           <Link
-                            href={`/features/${user.accountType}`}
+                            href={user.accountType === 'buyer' ? `/features/buyer/${user.id}` : `/features/${user.accountType}/${user.id}`}
                             onClick={closeMenu}
-                            className="flex items-center gap-3 px-4 py-2.5 text-sm text-[#4a5a4e] hover:bg-[#1a3d2b]/5 hover:text-[#1a3d2b] transition-colors"
+                            className="flex items-center gapd-3 px-4 py-2.5 text-sm text-[#4a5a4e] hover:bg-[#1a3d2b]/5 hover:text-[#1a3d2b] transition-colors"
                           >
                             Dashboard
                           </Link>
@@ -131,7 +145,7 @@ const Navbar = () => {
                   )}
                 </AnimatePresence>
               </div>
-            ) : (
+            ) : shouldShowGuestUI ? (
               <div className="flex items-center gap-3">
                 <Link
                   href="/features/auth/login"
@@ -146,7 +160,7 @@ const Navbar = () => {
                   Join
                 </Link>
               </div>
-            )}
+            ) : null}
 
             <button
               onClick={toggleMenu}
@@ -194,14 +208,19 @@ const Navbar = () => {
               exit={{ height: 0, opacity: 0 }}
               className="md:hidden border-t border-[#d4c9b0] py-3 overflow-hidden"
             >
-              {['Explore', 'Growers', 'Produce', 'Stories'].map((item) => (
+              {[
+                { label: 'Explore', href: '/features/produce' },
+                { label: 'Farmers', href: '/features/farmer' },
+                { label: 'Produce', href: '/features/produce' },
+                { label: 'Sellers', href: '/features/grocer' },
+              ].map((item) => (
                 <Link
-                  key={item}
-                  href={`/${item.toLowerCase()}`}
+                  key={item.label}
+                  href={item.href}
                   onClick={closeMenu}
                   className="block px-4 py-3 text-[11px] font-black uppercase tracking-widest text-[#4a5a4e] hover:bg-[#1a3d2b]/5 hover:text-[#1a3d2b] transition-colors rounded-lg"
                 >
-                  {item}
+                  {item.label}
                 </Link>
               ))}
             </motion.div>

@@ -3,6 +3,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { MapPin, Star, Leaf, Loader2 } from "lucide-react";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
 import { setSearchQuery } from "@/store/contentSlice";
@@ -30,7 +31,7 @@ function FarmerCard({ farmer }: { farmer: Farmer }) {
       />
       <div className="flex items-start gap-4 mb-4">
         <div className="w-14 h-14 rounded-xl overflow-hidden shrink-0 border border-[#d4c9b0]">
-          <img src={farmer.avatar} alt={farmer.name} className="w-full h-full object-cover" />
+          <Image src={farmer.avatar} alt={farmer.name} className="w-full h-full object-cover" />
         </div>
         <div className="flex-1 min-w-0">
           <p className="text-[10px] font-black uppercase tracking-widest text-[#e86c2a] mb-0.5">
@@ -110,7 +111,7 @@ export default function FarmersPage() {
   return (
     <div className="min-h-screen bg-[#f5f0e8] pt-24">
       <div className="bg-[#1a3d2b] px-6 py-14 relative overflow-hidden">
-        <div className="absolute top-0 left-0 right-0 h-[3px] bg-[#e8c84a]" />
+        <div className="absolute top-0 left-0 right-0 h-0.75 bg-[#e8c84a]" />
         <div className="absolute right-0 top-0 bottom-0 w-20 flex items-center justify-center pointer-events-none overflow-hidden">
           <span
             className="text-[8rem] font-black text-white/4 uppercase select-none whitespace-nowrap"

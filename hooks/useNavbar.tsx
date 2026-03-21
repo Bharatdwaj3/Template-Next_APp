@@ -17,16 +17,10 @@ export function useNavbar() {
   const [searchQuery,  setSearchQuery]  = useState('');
 
   useEffect(() => {
-    // Reset fetch flag when user is cleared (logout)
-    if (!user && !loading) {
-      if (!hasFetched.current) {
+
+    if (!user && !loading && !hasFetched.current) {
         hasFetched.current = true;
         dispatch(fetchUser());
-      }
-    }
-    if (user) {
-      // User is loaded — allow re-fetch on next logout
-      hasFetched.current = false;
     }
   }, [dispatch, user, loading]);
 
@@ -34,6 +28,7 @@ export function useNavbar() {
     try {
       await fetch('/api/auth/logout', { method: 'POST' });
       dispatch(clearUser());
+      hasFetched.current = false;
       setIsMenuOpen(false);
       router.push('/features/auth/login');
     } catch {

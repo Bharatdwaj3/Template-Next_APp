@@ -1,7 +1,6 @@
-// app/explore/page.tsx
+
 import { Sprout } from 'lucide-react';
 
-// ✅ Option 1: Direct default export (simplest)
 export default function ExplorePage() {
   return (
     <div className="min-h-screen bg-[#f5f0e8] p-6">

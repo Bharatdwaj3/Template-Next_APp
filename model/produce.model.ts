@@ -1,56 +1,86 @@
+import { Schema, model, models } from "mongoose";
 
-import { Schema, model } from 'mongoose';
-
-const grocerSchema = new Schema(
+const produceSchema = new Schema(
   {
-    userId: {
-      type:     Schema.Types.ObjectId,
-      ref:      'User',
+    farmerId: {
+      type: Schema.Types.ObjectId,
+      ref: "User",
       required: true,
-      unique:   true,
     },
 
-    bio: {
-      type:      String,
-      required:  true,
-      trim:      true,
-      maxlength: 1000,
-    },
-
-    shopName: {
-      type:      String,
-      required:  true,
-      trim:      true,
+    name: {
+      type: String,
+      required: true,
+      trim: true,
       maxlength: 100,
     },
 
-    location: {
-      address:     { type: String, trim: true },
-      coordinates: { type: [Number], index: '2dsphere' }, 
+    description: {
+      type: String,
+      trim: true,
+      maxlength: 1000,
+      default: "",
     },
-    savedProduce: [{
-      type: Schema.Types.ObjectId,
-      ref:  'Produce',
-    }],
 
-    likedProduce: [{
-      type: Schema.Types.ObjectId,
-      ref:  'Produce',
-    }],
-    followers: [{
-      type: Schema.Types.ObjectId,
-      ref:  'User',
-    }],
+    price: {
+      type: Number,
+      required: true,
+      min: 0,
+    },
 
-      following: [{
-      type: Schema.Types.ObjectId,
-      ref:  'User',
-    }],
+    unit: {
+      type: String,
+      required: true,
+      trim: true,
+    },
 
-    mediaUrl:     { type: String, default: '' },
-    cloudinaryId: { type: String, default: '' },
+    stock: {
+      type: Number,
+      default: 0,
+      min: 0,
+    },
+
+    category: {
+      type: String,
+      enum: [
+        "Vegetables",
+        "Fruits",
+        "Herbs",
+        "Root Veg",
+        "Natural",
+        "Dairy",
+        "Grains",
+      ],
+    },
+
+    img: {
+      type: String,
+      default: "",
+    },
+
+    cloudinaryId: {
+      type: String,
+      default: "",
+    },
+
+    isOrganic: {
+      type: Boolean,
+      default: false,
+    },
+
+    rating: {
+      type: Number,
+      default: 0,
+      min: 0,
+      max: 5,
+    },
+
+    totalReviews: {
+      type: Number,
+      default: 0,
+    },
   },
-  { timestamps: true },
+  { timestamps: true }
 );
 
-export default model('Grocer', grocerSchema, 'grocers');
+export default models.Produce ?? model("Produce", produceSchema, "produce");

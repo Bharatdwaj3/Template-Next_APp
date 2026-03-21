@@ -1,4 +1,25 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
+import type { RootState } from './store';
+
+const loadUserFromStorage = () => {
+  if (typeof window === 'undefined') return null;
+  try {
+    const stored = localStorage.getItem('auth_user');
+    return stored ? JSON.parse(stored) : null;
+  } catch {
+    return null;
+  }
+};
+
+const persistUserToStorage = (user: any) => {
+  if (typeof window === 'undefined') return;
+  if (user) {
+    localStorage.setItem('auth_user', JSON.stringify(user));
+  } else {
+    localStorage.removeItem('auth_user');
+  }
+};
+
 
 export interface NerthusUser {
   id:          string;
@@ -19,24 +40,25 @@ interface AvatarState {
 }
 
 const initialState: AvatarState = {
-  user:    null,
+  user:    loadUserFromStorage(),
   loading: false,
   error:   null,
 };
 
 export const fetchUser = createAsyncThunk(
   'avatar/fetchUser',
-  async (_, { rejectWithValue }) => {
+  async (_, { rejectWithValue, getState }) => {
+    const state = getState() as RootState;
+    if (state.avatar.user){
+      return {skip: true};
+    }
+
     try {
       let res = await fetch('/api/auth/profile');
 
-      // Try refresh once if expired
       if (res.status === 401) {
         const refresh = await fetch('/api/auth/refresh', { method: 'POST' });
-        if (!refresh.ok) {
-          // Refresh failed — user is genuinely not logged in, stop here
-          return rejectWithValue(null);
-        }
+        if (!refresh.ok) return rejectWithValue(null);
         res = await fetch('/api/auth/profile');
       }
 
@@ -55,30 +77,41 @@ const avatarSlice = createSlice({
   name: 'avatar',
   initialState,
   reducers: {
+    setUser:(state, action)=>{
+      state.user=action.payload;
+      state.error=null;
+      state.loading=false;
+      persistUserToStorage(action.payload);
+    },
     clearUser: (state) => {
       state.user    = null;
       state.error   = null;
       state.loading = false;
+      persistUserToStorage(null);
+    },
+    setLoading:(state, action)=>{
+      state.loading=action.payload;
     },
   },
   extraReducers: (builder) => {
     builder
-      .addCase(fetchUser.pending, (state) => {
-        state.loading = true;
-        state.error   = null;
-      })
-      .addCase(fetchUser.fulfilled, (state, action) => {
-        state.loading = false;
-        state.user    = action.payload;
-      })
-      .addCase(fetchUser.rejected, (state) => {
-        state.loading = false;
-        state.user    = null;
-        // Don't set error — unauthenticated is normal, not an error
-        state.error   = null;
-      });
+    .addCase(fetchUser.pending, (state)=>{
+      state.loading=true;
+      state.error=null;
+    })
+    .addCase(fetchUser.fulfilled, (state, action) => {
+    state.loading = false;
+    if(action.payload && !(action.payload as any).skip){
+      state.user=action.payload as NerthusUser;
+      persistUserToStorage(action.payload)
+    }
+    })
+    .addCase(fetchUser.rejected, (state, action) => {
+      state.loading = false;
+      state.error    = 'Failed to load user';
+    });
   },
 });
 
-export const { clearUser } = avatarSlice.actions;
+export const { clearUser, setUser, setLoading } = avatarSlice.actions;
 export default avatarSlice.reducer;

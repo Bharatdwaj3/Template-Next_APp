@@ -1,26 +1,34 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
 import { fetchUser, clearUser } from '@/store/avatarSlice';
-
 
 export function useNavbar() {
   const dispatch = useAppDispatch();
   const router   = useRouter();
 
   const { user, loading } = useAppSelector((state) => state.avatar);
+  const hasFetched = useRef(false);
 
   const [isMenuOpen,   setIsMenuOpen]   = useState(false);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [searchQuery,  setSearchQuery]  = useState('');
 
   useEffect(() => {
-    if (!user) {
-      dispatch(fetchUser());
+    // Reset fetch flag when user is cleared (logout)
+    if (!user && !loading) {
+      if (!hasFetched.current) {
+        hasFetched.current = true;
+        dispatch(fetchUser());
+      }
     }
-  }, [dispatch, user]);
+    if (user) {
+      // User is loaded — allow re-fetch on next logout
+      hasFetched.current = false;
+    }
+  }, [dispatch, user, loading]);
 
   const handleLogout = async () => {
     try {

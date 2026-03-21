@@ -8,13 +8,13 @@ import {
   Package, Loader2, LogOut, Plus, Edit,
 } from 'lucide-react';
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
-import { clearUser }          from '@/store/avatarSlice';
-import { clearFollowing }     from '@/store/followSlice';
-import { clearSavedProduce, markProduceViewed } from '@/store/contentSlice';
-import { useFollow }          from '@/hooks/useFollow';
+import { clearUser }           from '@/store/avatarSlice';
+import { clearFollowing }      from '@/store/followSlice';
+import { clearSavedProduce, markProduceVisited } from '@/store/contentSlice';
+import { useFollow }           from '@/hooks/useFollow';
 
 interface FarmerProfile {
-  _id:     string;
+  _id:      string;
   userName: string;
   fullName: string;
   profile: {
@@ -44,65 +44,66 @@ const STATUS_STYLES: Record<string, string> = {
   Processing: 'bg-[#e8c84a]/20 text-[#8a6a00]',
 };
 
-export default function FarmerProfilePage({params}:{params: {id: string}}){
-    const router=useRouter();
-    const dispatch =useAppDispatch();
-    const currentUser=useAppSelector((s)=>s.avatar.user);
+function formatDate(iso: string) {
+  return new Date(iso).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' });
+}
 
-    const [farmer, setFarmer]=useState<FarmerProfile | null>(null);
-    const [dash, setDash]=useState<DashboardData | null>(null);
-    const [loading, setLoading]=useState(true);
-    const [loggingOut, setLoggingOut]=useState(false);
-    const {isFollowing, toggle}=useFollow('false', params.id);
-    const isOwner=currentUser?.id===params.id;
+function formatPrice(price: number) {
+  return `₹${price.toLocaleString('en-IN')}`;
+}
 
-  useEffect(()=>{
-    const load=async()=>{
-      try{
-        const res=await fetch(`/api/farmer/${params.id}`);
+export default function FarmerProfilePage({ params }: { params: { id: string } }) {
+  const router      = useRouter();
+  const dispatch    = useAppDispatch();
+  const currentUser = useAppSelector((s) => s.avatar.user);
+
+  const [farmer,     setFarmer]     = useState<FarmerProfile | null>(null);
+  const [dash,       setDash]       = useState<DashboardData | null>(null);
+  const [loading,    setLoading]    = useState(true);
+  const [loggingOut, setLoggingOut] = useState(false);
+
+  const { isFollowing, toggle } = useFollow('farmer', params.id);
+  const isOwner = currentUser?.id === params.id;
+
+  useEffect(() => {
+    const load = async () => {
+      try {
+        const res  = await fetch(`/api/farmer/${params.id}`);
         const data = await res.json();
 
-        if(res.status===401){
-          router.push('features/auth/login');
-          return;
-        }
-        if(res.status===403){
-          router.push('unauthorized');
-          return;
-        }
-        if(!data.success){
-          setFarmer(null);
-          return;
-        }
+        if (res.status === 401) { router.push('/features/auth/login'); return; }
+        if (res.status === 403) { router.push('/unauthorized');         return; }
+        if (!data.success)      { setFarmer(null); return; }
+
         setFarmer(data.farmer);
 
-        if(currentUser?.id===params.id){
-          const dashRes=await fetch('/api/farmer/dashboard');
-          const dashData=await dashRes.json();
-          if(dashData.success)
-            setDash(dashData.dashboard);
+        if (currentUser?.id === params.id) {
+          const dashRes  = await fetch('/api/farmer/dashboard');
+          const dashData = await dashRes.json();
+          if (dashData.success) setDash(dashData.dashboard);
         }
-      }catch(err){
+      } catch (err) {
+        console.error(err);
         setFarmer(null);
-        console.log(err);
-      }finally{
+      } finally {
         setLoading(false);
       }
     };
     load();
-  },[params.id, router, currentUser?.id]);
+  }, [params.id, router, currentUser?.id]);
 
-  const handleLogout=async()=>{
+  const handleLogout = async () => {
     setLoggingOut(true);
-    try{
-      await fetch('/api/auth/logout',{method:'POST'});
-    }finally{
+    try {
+      await fetch('/api/auth/logout', { method: 'POST' });
+    } finally {
       dispatch(clearUser());
       dispatch(clearFollowing());
       dispatch(clearSavedProduce());
-      router.push('features/auth/login');
+      router.push('/features/auth/login');
     }
   };
+
   if (loading) return (
     <div className="min-h-screen bg-[#f5f0e8] flex items-center justify-center pt-20">
       <Loader2 className="w-8 h-8 text-[#1a3d2b] animate-spin" />
@@ -161,7 +162,6 @@ export default function FarmerProfilePage({params}:{params: {id: string}}){
             <img src={p.avatar} alt={farmer.fullName} className="w-full h-full object-cover" />
             <div className="absolute top-0 left-0 right-0 h-[3px] bg-[#e8c84a]" />
           </div>
-
           <div className="pb-1">
             <p className="text-[10px] font-black uppercase tracking-[0.5em] text-[#e86c2a] mb-0.5">Verified Farmer</p>
             <h1 className="text-3xl font-black text-[#1a3d2b] uppercase tracking-tight leading-none">{p.farmName}</h1>
@@ -172,9 +172,7 @@ export default function FarmerProfilePage({params}:{params: {id: string}}){
                 <b className="text-[#1a3d2b]">{p.rating}</b> ({p.totalReviews})
               </span>
               {p.isOrganic && (
-                <span className="flex items-center gap-1 font-bold text-[#1a3d2b]">
-                  <Leaf size={11} /> Organic
-                </span>
+                <span className="flex items-center gap-1 font-bold text-[#1a3d2b]"><Leaf size={11} /> Organic</span>
               )}
             </div>
           </div>
@@ -196,7 +194,7 @@ export default function FarmerProfilePage({params}:{params: {id: string}}){
           )}
         </div>
 
-        {/* Stats — owner sees order stats, visitor sees profile stats */}
+        {/* Stats */}
         <div className="grid grid-cols-3 gap-4 mb-10">
           {(isOwner && dash?.stats
             ? dash.stats.slice(0, 3).map((s) => ({ label: s.label, val: s.value }))
@@ -222,7 +220,7 @@ export default function FarmerProfilePage({params}:{params: {id: string}}){
             <p className="text-[10px] font-black uppercase tracking-[0.5em] text-[#e86c2a] mb-3">Specialties</p>
             <div className="flex flex-wrap gap-2">
               {p.interests?.map((s) => (
-                <span key={s} className="text-[10px] font-black uppercase tracking-widest px-3 py-1.5 rounded-full bg-[#1a3d2b]/8 text-[#1a3d2b] border border-[#1a3d2b]/15">{s}</span>
+                <span key={s} className="text-[10px] font-black uppercase tracking-widest px-3 py-1.5 rounded-full bg-[#1a3d2b]/10 text-[#1a3d2b] border border-[#1a3d2b]/15">{s}</span>
               ))}
             </div>
           </div>
@@ -237,7 +235,7 @@ export default function FarmerProfilePage({params}:{params: {id: string}}){
             <div className="grid grid-cols-3 gap-5">
               {p.produce.map((item) => (
                 <Link key={item._id} href={`/features/produce/${item._id}`}
-                  onClick={() => dispatch(markProduceViewed(item._id))}
+                  onClick={() => dispatch(markProduceVisited(item._id))}
                   className="bg-white border border-[#d4c9b0] rounded-2xl overflow-hidden hover:border-[#1a3d2b]/40 hover:shadow-md transition-all group">
                   <div className="relative w-full h-36 overflow-hidden">
                     <img src={item.img} alt={item.name} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />
@@ -245,7 +243,7 @@ export default function FarmerProfilePage({params}:{params: {id: string}}){
                   <div className="p-4 flex items-center justify-between">
                     <div>
                       <p className="text-[12px] font-black text-[#1a3d2b] uppercase">{item.name}</p>
-                      <p className="text-[10px] text-[#8a9a8e]">₹{item.price} / {item.unit}</p>
+                      <p className="text-[10px] text-[#8a9a8e]">{formatPrice(item.price)} / {item.unit}</p>
                     </div>
                     <Package size={14} className="text-[#8a9a8e]" />
                   </div>
@@ -257,7 +255,6 @@ export default function FarmerProfilePage({params}:{params: {id: string}}){
 
         {isOwner && dash && (
           <div className="grid grid-cols-12 gap-6 mb-16">
-
             <div className="col-span-7 bg-white border border-[#d4c9b0] rounded-2xl overflow-hidden">
               <div className="bg-[#1a3d2b] px-6 py-4">
                 <p className="text-[9px] font-black uppercase tracking-[0.4em] text-[#e8c84a]/50">Latest</p>
@@ -297,7 +294,7 @@ export default function FarmerProfilePage({params}:{params: {id: string}}){
                       <span className={`text-[9px] font-black uppercase tracking-widest px-2.5 py-1 rounded-full ${
                         l.status === 'Active' ? 'bg-[#1a3d2b]/10 text-[#1a3d2b]' : 'bg-[#e86c2a]/10 text-[#e86c2a]'
                       }`}>{l.status}</span>
-                      <button className="opacity-0 group-hover:opacity-100 p-1.5 hover:bg-[#1a3d2b]/8 rounded-lg">
+                      <button className="opacity-0 group-hover:opacity-100 p-1.5 hover:bg-[#1a3d2b]/10 rounded-lg">
                         <Edit size={12} className="text-[#8a9a8e]" />
                       </button>
                     </div>
@@ -307,9 +304,7 @@ export default function FarmerProfilePage({params}:{params: {id: string}}){
             </div>
           </div>
         )}
-
       </div>
     </div>
   );
-
 }

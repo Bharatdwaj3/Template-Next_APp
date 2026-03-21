@@ -15,10 +15,11 @@ const ERROR_CODES: Record<string, string> = {
   LOGIN_FAILED: 'Server error. Please try again.',
 };
 
-const REDIRECT: Record<string, string> = {
-  farmer: '/features/farmer/dashboard',
-  grocer: '/features/grocer/dashboard',
-  buyer:  '/features/produce',
+// After login, redirect to the user's own profile page using their id
+const getRedirect = (accountType: string, id: string) => {
+  if (accountType === 'farmer') return `/features/farmer/${id}`;
+  if (accountType === 'grocer') return `/features/grocer/${id}`;
+  return '/features/produce';
 };
 
 export default function LoginPage() {
@@ -46,7 +47,7 @@ export default function LoginPage() {
         setError(ERROR_CODES[data.code] ?? data.message ?? 'Something went wrong');
         return;
       }
-      router.push(REDIRECT[data.user.accountType] ?? '/features/produce');
+      router.push(getRedirect(data.user.accountType, data.user.id));
     } catch (err) {
       console.error(err);
       setError('Network error. Please check your connection.');
@@ -63,10 +64,10 @@ export default function LoginPage() {
         transition={{ duration: 0.8 }}
         className="hidden lg:flex w-[45%] bg-[#1a3d2b] flex-col justify-between px-16 py-14 relative overflow-hidden"
       >
-        <div className="absolute top-0 left-0 right-0 h-[3px] bg-[#e8c84a]" />
+        <div className="absolute top-0 left-0 right-0 h-0.75 bg-[#e8c84a]" />
         <div className="absolute right-0 top-0 bottom-0 w-20 flex items-center justify-center overflow-hidden pointer-events-none">
           <span
-            className="text-[8rem] font-black text-white/[0.04] uppercase select-none whitespace-nowrap"
+            className="text-[8rem] font-black text-white/4 uppercase select-none whitespace-nowrap"
             style={{ writingMode: 'vertical-rl', letterSpacing: '-0.05em' }}
           >
             Nerthus

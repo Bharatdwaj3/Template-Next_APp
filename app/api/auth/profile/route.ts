@@ -1,13 +1,13 @@
 import { NextResponse } from 'next/server';
 import User from '@/model/user.model';
 import { connectDB } from '@/lib/db';
-import { getAuthenticatedUser } from '@/lib/auth';
+import { getCurrentUser } from '@/lib/auth/currentUser';
 
-export async function GET(request: Request) {
+export async function GET() {
   try {
     await connectDB();
 
-    const currentUser = await getAuthenticatedUser(request);
+    const currentUser = await getCurrentUser();
     if (!currentUser) {
       return NextResponse.json(
         { success: false, message: 'Not authenticated', code: 'AUTH_REQUIRED' },

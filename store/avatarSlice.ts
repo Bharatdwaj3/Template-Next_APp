@@ -28,17 +28,25 @@ export const fetchUser = createAsyncThunk(
   'avatar/fetchUser',
   async (_, { rejectWithValue }) => {
     try {
-      const res = await fetch('/api/auth/profile');
+      let res = await fetch('/api/auth/profile');
+
+      // Try refresh once if expired
       if (res.status === 401) {
-        return rejectWithValue('Not authenticated');
+        const refresh = await fetch('/api/auth/refresh', { method: 'POST' });
+        if (!refresh.ok) {
+          // Refresh failed — user is genuinely not logged in, stop here
+          return rejectWithValue(null);
+        }
+        res = await fetch('/api/auth/profile');
       }
+
+      if (!res.ok) return rejectWithValue(null);
+
       const data = await res.json();
-      if (!data.success) {
-        return rejectWithValue(data.message ?? 'Failed to load user');
-      }
+      if (!data.success) return rejectWithValue(null);
       return data.user as NerthusUser;
     } catch {
-      return rejectWithValue('Network error. Could not load profile');
+      return rejectWithValue(null);
     }
   }
 );
@@ -63,10 +71,11 @@ const avatarSlice = createSlice({
         state.loading = false;
         state.user    = action.payload;
       })
-      .addCase(fetchUser.rejected, (state, action) => {
+      .addCase(fetchUser.rejected, (state) => {
         state.loading = false;
-        state.error   = action.payload as string ?? 'Unknown error';
         state.user    = null;
+        // Don't set error — unauthenticated is normal, not an error
+        state.error   = null;
       });
   },
 });

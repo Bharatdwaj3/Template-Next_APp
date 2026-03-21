@@ -1,9 +1,10 @@
 import { NextResponse } from 'next/server';
-import { clearAuthCookies, revokeRefreshToken, getAuthenticatedUser } from '@/lib/auth';
+import { clearAuthCookies, revokeRefreshToken } from '@/lib/auth';
+import { getCurrentUser } from '@/lib/auth/currentUser';
 
-export async function POST(request: Request) {
+export async function POST() {
   try {
-    const user = await getAuthenticatedUser(request);
+    const user = await getCurrentUser();
     if (user?.id) {
       await revokeRefreshToken(user.id);
     }

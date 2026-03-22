@@ -10,6 +10,7 @@ import {
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
 import { clearUser }                      from '@/store/avatarSlice';
 import { clearFollowing }                 from '@/store/followSlice';
+import ProtectedRoute        from '@/components/ProtectedRoute';
 import { clearSavedProduce, markProduceViewed } from '@/store/contentSlice';
 import { useFollow }                      from '@/hooks/useFollow';
 import { formatPrice, formatDate }        from '@/hooks/produceHelpers';
@@ -104,6 +105,7 @@ export default function GrocerProfilePage({ params }: { params: Promise<{ id: st
   );
 
   return (
+    <ProtectedRoute allowedRole="grocer">
     <div className="min-h-screen bg-[#f5f0e8] pt-20">
 
       <div className="relative w-full h-56 overflow-hidden">
@@ -277,5 +279,6 @@ export default function GrocerProfilePage({ params }: { params: Promise<{ id: st
         )}
       </div>
     </div>
+    </ProtectedRoute>
   );
 }

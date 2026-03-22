@@ -10,6 +10,7 @@ import {
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
 import { clearUser }           from '@/store/avatarSlice';
 import { clearFollowing }      from '@/store/followSlice';
+import ProtectedRoute        from '@/components/ProtectedRoute';
 import { clearSavedProduce, markProduceVisited } from '@/store/contentSlice';
 import { useFollow }           from '@/hooks/useFollow';
 
@@ -125,6 +126,7 @@ export default function FarmerProfilePage({ params }: { params: Promise<{ id: st
   const p = farmer.profile;
 
   return (
+    <ProtectedRoute allowedRole="farmer">
     <div className="min-h-screen bg-[#f5f0e8] pt-20">
 
       <div className="relative w-full h-56 overflow-hidden">
@@ -305,5 +307,6 @@ export default function FarmerProfilePage({ params }: { params: Promise<{ id: st
         )}
       </div>
     </div>
+    </ProtectedRoute>
   );
 }

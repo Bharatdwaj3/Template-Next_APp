@@ -11,6 +11,7 @@ import {
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
 import { clearUser }                      from '@/store/avatarSlice';
 import { clearFollowing }                 from '@/store/followSlice';
+import ProtectedRoute        from '@/components/ProtectedRoute';
 import { clearSavedProduce, markProduceVisited } from '@/store/contentSlice';
 
 interface BuyerProfile {
@@ -81,7 +82,7 @@ export default function BuyerProfilePage({ params }: { params: Promise<{ id: str
       }
     };
     load();
-  }, [id, router, isOwner]);
+  }, [params.id, router, isOwner]);
 
   const handleLogout = async () => {
     setLoggingOut(true);
@@ -114,6 +115,7 @@ export default function BuyerProfilePage({ params }: { params: Promise<{ id: str
   const p = buyer.profile;
 
   return (
+    <ProtectedRoute allowedRole="buyer">
     <div className="min-h-screen bg-[#f5f0e8] pt-20">
 
       {/* Cover — color block since buyers have no coverImg */}
@@ -266,5 +268,6 @@ export default function BuyerProfilePage({ params }: { params: Promise<{ id: str
 
       </div>
     </div>
+    </ProtectedRoute>
   );
 }

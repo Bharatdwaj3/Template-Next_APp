@@ -6,7 +6,7 @@ export default function Unauthorized() {
     <div className="min-h-screen bg-[#f5f0e8] flex">
 
       <div className="hidden lg:flex w-[45%] bg-[#1a3d2b] flex-col justify-between px-16 py-14 relative overflow-hidden">
-        <div className="absolute top-0 left-0 right-0 h-[3px] bg-[#e8c84a]" />
+        <div className="absolute top-0 left-0 right-0 h-0.75 bg-[#e8c84a]" />
 
         <div className="absolute right-0 top-0 bottom-0 w-20 flex items-center justify-center overflow-hidden pointer-events-none">
           <span
@@ -63,7 +63,7 @@ export default function Unauthorized() {
 
         <div className="flex flex-col sm:flex-row gap-3 justify-center">
           <Link
-            href="/login"
+            href="/features/auth/login"
             className="flex items-center justify-center gap-2 bg-[#1a3d2b] text-[#e8c84a] text-[11px] font-black uppercase tracking-widest px-8 py-3.5 rounded-xl hover:bg-[#1a3d2b]/90 transition-colors"
           >
             Sign In →

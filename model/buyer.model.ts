@@ -1,39 +1,57 @@
-import { Schema, model } from 'mongoose';
+import mongoose, { Model, Schema, Document, Types } from 'mongoose';
 
-const buyerSchema = new Schema(
+export interface IBuyer extends Document {
+  userId: Types.ObjectId;
+  savedProduce: Types.ObjectId[];
+  orderHistory: Types.ObjectId[];
+  following: Types.ObjectId[];
+  deliveryAddresses: Array<{
+    label?: string;
+    address?: string;
+    coordinates?: number[];
+  }>;
+  mediaUrl: string;
+  cloudinaryId: string;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+const buyerSchema = new Schema<IBuyer>(
   {
-    userId: {
-      type:     Schema.Types.ObjectId,
-      ref:      'User',
-      required: true,
-      unique:   true,
+    userId: { 
+      type: Schema.Types.ObjectId, 
+      ref: 'User', 
+      required: true, 
+      unique: true 
     },
 
     savedProduce: [{
       type: Schema.Types.ObjectId,
-      ref:  'Produce',
+      ref: 'Produce',
     }],
 
     orderHistory: [{
       type: Schema.Types.ObjectId,
-      ref:  'Order',
+      ref: 'Order',
     }],
 
     following: [{
       type: Schema.Types.ObjectId,
-      ref:  'User',
+      ref: 'User',
     }],
 
     deliveryAddresses: [{
-      label:       { type: String, trim: true },
-      address:     { type: String, trim: true },
-      coordinates: { type: [Number] },
+      label: { type: String, trim: true },
+      address: { type: String, trim: true },
+      coordinates: { type: [Number] }, 
     }],
 
-    mediaUrl:     { type: String, default: '' },
+    mediaUrl: { type: String, default: '' },
     cloudinaryId: { type: String, default: '' },
   },
-  { timestamps: true },
+  { timestamps: true }
 );
 
-export default model('Buyer', buyerSchema, 'buyers');
+const Buyer: Model<IBuyer> = mongoose.models.Buyer || mongoose.model<IBuyer>('Buyer', buyerSchema, 'buyers');
+
+export default Buyer;

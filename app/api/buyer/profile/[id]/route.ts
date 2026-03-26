@@ -1,3 +1,5 @@
+//buyer/profile/[id]/route.ts
+
 import { NextRequest, NextResponse } from 'next/server';
 import Buyer from '@/model/buyer.model';
 import User from '@/model/user.model';

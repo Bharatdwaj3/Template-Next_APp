@@ -1,7 +1,7 @@
-// buyer/profile/route.ts
+//farmer/profile/route.ts
 
 import { NextResponse } from 'next/server';
-import Buyer from '@/model/buyer.model';
+import Farmer from '@/model/farmer.model';
 import { connectDB } from '@/lib/db';
 
 export async function GET() {
@@ -9,22 +9,22 @@ export async function GET() {
   
     await connectDB();
 
-    const buyers = await Buyer.find({})
+    const farmers = await Farmer.find({})
       .populate('userId', 'userName fullName email avatar accountType')
       .sort({ createdAt: -1 }); 
 
     return NextResponse.json({
       success: true,
-      count: buyers.length,
-      buyers,
+      count: farmers.length,
+      farmers,
     });
 
   } catch (error: any) {
-    console.error('Error fetching buyers:', error);
+    console.error('Error fetching Farmers:', error);
     return NextResponse.json(
       { 
         success: false, 
-        message: error.message || 'Failed to fetch buyers' 
+        message: error.message || 'Failed to fetch Farmers' 
       },
       { status: 500 }
     );

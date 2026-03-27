@@ -2,10 +2,10 @@
 import { NextRequest, NextResponse } from "next/server";
 import mongoose from "mongoose";
 import Produce from "@/model/produce.model";
+import Farmer from "@/model/farmer.model";
 import { getCurrentUser } from "@/lib/auth/currentUser";
 import { connectDB } from "@/lib/db";
 import PERMISSIONS from "@/config/permissions.config";
-import upload from "@/services/mutler";
  
 export async function GET(
   req: NextRequest,
@@ -46,7 +46,6 @@ export async function PUT(
       return NextResponse.json({ message: "Unauthorized" }, { status: 401 });
     }
  
-    // ✅ fixed: removed 'grocer' — only farmer and admin can update produce
     if (!["farmer", "admin"].includes(user.accountType || "")) {
       return NextResponse.json({ message: "Forbidden" }, { status: 403 });
     }
@@ -67,8 +66,9 @@ export async function PUT(
       );
     }
  
-    const updateData: Record<string, any> = {};
+    // Handle both JSON and FormData for updates
     const contentType = req.headers.get("content-type") || "";
+    const updateData: Record<string, any> = {};
  
     if (contentType.includes("application/json")) {
       const body = await req.json();
@@ -80,20 +80,22 @@ export async function PUT(
       if (body.category) updateData.category = body.category;
       if (body.isOrganic !== undefined) updateData.isOrganic = body.isOrganic;
       if (body.rating !== undefined) updateData.rating = parseFloat(body.rating);
-    }
- 
-    if (contentType.includes("multipart/form-data")) {
-      await new Promise((resolve, reject) => {
-        upload.single("image")(req as any, {} as any, (err: any) => {
-          if (err) return reject(err);
-          resolve(true);
-        });
-      });
- 
-      const multerReq: any = req;
-      if (multerReq.file) {
-        updateData.img = multerReq.file.path;
-        updateData.cloudinaryId = multerReq.file.filename;
+    } 
+    else if (contentType.includes("multipart/form-data")) {
+      const formData = await req.formData();
+      if (formData.get('name')) updateData.name = formData.get('name');
+      if (formData.get('description')) updateData.description = formData.get('description');
+      if (formData.get('price')) updateData.price = parseFloat(formData.get('price') as string);
+      if (formData.get('unit')) updateData.unit = formData.get('unit');
+      if (formData.get('stock')) updateData.stock = parseInt(formData.get('stock') as string);
+      if (formData.get('category')) updateData.category = formData.get('category');
+      if (formData.get('isOrganic')) updateData.isOrganic = formData.get('isOrganic') === 'true';
+      
+      const imageFile = formData.get('image') as File | null;
+      if (imageFile) {
+        const bytes = await imageFile.arrayBuffer();
+        const buffer = Buffer.from(bytes);
+        updateData.img = `data:${imageFile.type};base64,${buffer.toString('base64')}`;
       }
     }
  
@@ -149,6 +151,16 @@ export async function DELETE(
           { status: 403 }
         );
       }
+    }
+ 
+    // Remove from farmer's produce array if Farmer model exists
+    try {
+      await Farmer.findOneAndUpdate(
+        { userId: produce.farmerId },
+        { $pull: { produce: id } }
+      );
+    } catch (error) {
+      console.log('Note: Could not update farmer produce array');
     }
  
     await Produce.findByIdAndDelete(id);

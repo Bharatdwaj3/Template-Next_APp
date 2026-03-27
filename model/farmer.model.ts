@@ -1,4 +1,5 @@
-import mongoose, { Schema, model, Document } from 'mongoose';
+import mongoose, { Schema, model, Document, models } from 'mongoose';
+import '@/model/user.model';
 
 export interface IFarmer extends Document {
   userId:       mongoose.Types.ObjectId;
@@ -72,6 +73,4 @@ const farmerSchema = new Schema<IFarmer>(
   { timestamps: true },
 );
 
-farmerSchema.index({ bio: 'text', interests: 'text' });
-
-export default model<IFarmer>('Farmer', farmerSchema, 'farmers');
+export default models.Farmer ?? model<IFarmer>('Farmer', farmerSchema, 'farmers');

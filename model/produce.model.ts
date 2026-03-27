@@ -1,4 +1,5 @@
 import { Schema, model, models } from "mongoose";
+import '@/model/user.model';
 
 const produceSchema = new Schema(
   {
@@ -42,15 +43,7 @@ const produceSchema = new Schema(
 
     category: {
       type: String,
-      enum: [
-        "Vegetables",
-        "Fruits",
-        "Herbs",
-        "Root Veg",
-        "Natural",
-        "Dairy",
-        "Grains",
-      ],
+      enum: ["Vegetables","Fruits","Herbs","Root Veg","Natural","Dairy","Grains",],
     },
 
     img: {

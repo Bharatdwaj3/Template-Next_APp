@@ -15,30 +15,107 @@ interface ProduceGridProps {
   onAddToCart: (produce: Produce) => void;
 }
 
-export const ProduceGrid = ({ onAddToCart }: ProduceGridProps) => {
+// Define the API response type
+interface ApiProduceItem {
+  _id: string;
+  name: string;
+  description: string;
+  price: number;
+  unit: string;
+  stock: number;
+  category: string;
+  img: string;
+  isOrganic: boolean;
+  rating: number;
+  totalReviews: number;
+  farmerId: {
+    _id: string;
+    userName: string;
+    fullName: string;
+    location?: { address?: string };
+  };
+}
+
+export function ProduceGrid({ onAddToCart }: ProduceGridProps) {
   const dispatch = useAppDispatch();
 
   const selectedCategory = useAppSelector((s) => s.content.selectedCategory);
   const searchQuery      = useAppSelector((s) => s.content.searchQuery);
 
-  const [produce,     setProduce]     = useState<Produce[]>([]);
-  const [loading,     setLoading]     = useState(true);
-  const [sort,        setSort]        = useState('Newest');
+  const [produce, setProduce] = useState<Produce[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [sort, setSort] = useState('Newest');
   const [showFilters, setShowFilters] = useState(false);
 
   useEffect(() => {
     const load = async () => {
       setLoading(true);
       try {
-        const params = new URLSearchParams();
-        if (selectedCategory !== 'all') params.set('category', selectedCategory);
-        if (searchQuery)                params.set('search', searchQuery);
-        params.set('sort', sort);
-
-        const res  = await fetch(`/api/produce?${params}`);
+        const res = await fetch('/api/produce/details/');
         const data = await res.json();
-        setProduce(data.success ? (data.produce ?? []) : []);
-      } catch {
+        
+        console.log('Produce data from API:', data);
+        
+        if (data.success && data.produce) {
+          // Convert the data to match the Produce interface
+          const formattedProduce: Produce[] = data.produce.map((item: ApiProduceItem) => ({
+            id: item._id,
+            name: item.name,
+            grower: item.farmerId?.fullName || 'Unknown Farmer',
+            location: item.farmerId?.location?.address || '',
+            price: item.price,
+            unit: item.unit,
+            rating: item.rating || 0,
+            reviews: item.totalReviews || 0,
+            category: item.category,
+            isOrganic: item.isOrganic,
+            isSeasonal: false,
+            img: item.img || '/placeholder.jpg'
+          }));
+          
+          // Apply filters client-side
+          let filtered = formattedProduce;
+          
+          // Apply category filter
+          if (selectedCategory !== 'all') {
+            filtered = filtered.filter((p: Produce) => p.category === selectedCategory);
+          }
+          
+          // Apply search filter
+          if (searchQuery) {
+            const query = searchQuery.toLowerCase();
+            filtered = filtered.filter((p: Produce) => 
+              p.name.toLowerCase().includes(query) ||
+              p.grower.toLowerCase().includes(query)
+            );
+          }
+          
+          // Apply sorting
+          switch (sort) {
+            case 'Price: Low':
+              filtered.sort((a: Produce, b: Produce) => a.price - b.price);
+              break;
+            case 'Price: High':
+              filtered.sort((a: Produce, b: Produce) => b.price - a.price);
+              break;
+            case 'Top Rated':
+              filtered.sort((a: Produce, b: Produce) => b.rating - a.rating);
+              break;
+            case 'Newest':
+            default:
+              // Newest by id (you can add createdAt if available)
+              filtered.sort((a: Produce, b: Produce) => b.id.localeCompare(a.id));
+              break;
+          }
+          
+          console.log('Filtered produce:', filtered);
+          setProduce(filtered);
+        } else {
+          console.error('API returned no produce:', data);
+          setProduce([]);
+        }
+      } catch (error) {
+        console.error('Error fetching produce:', error);
         setProduce([]);
       } finally {
         setLoading(false);
@@ -60,7 +137,9 @@ export const ProduceGrid = ({ onAddToCart }: ProduceGridProps) => {
                 selectedCategory === c
                   ? 'bg-[#1a3d2b] text-[#e8c84a] border-[#1a3d2b]'
                   : 'bg-white text-[#4a5a4e] border-[#d4c9b0] hover:border-[#1a3d2b]/40'
-              }`}>{c === 'all' ? 'All Produce' : c}</button>
+              }`}>
+              {c === 'all' ? 'All Produce' : c}
+            </button>
           ))}
         </div>
 
@@ -91,7 +170,7 @@ export const ProduceGrid = ({ onAddToCart }: ProduceGridProps) => {
                 {['Organic Only', 'In Season', 'Price Range'].map((label) => (
                   <div key={label}>
                     <p className="text-[10px] font-black uppercase tracking-widest text-[#1a3d2b] mb-2">{label}</p>
-                    <div className="w-8 h-[2px]" style={{ background: 'linear-gradient(90deg, #e8c84a, transparent)' }} />
+                    <div className="w-8 h-0.5" style={{ background: 'linear-gradient(90deg, #e8c84a, transparent)' }} />
                   </div>
                 ))}
               </div>
@@ -120,4 +199,4 @@ export const ProduceGrid = ({ onAddToCart }: ProduceGridProps) => {
       </div>
     </section>
   );
-};
+}

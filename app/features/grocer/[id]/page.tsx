@@ -1,26 +1,43 @@
+//features/grocer/[id]/page.tsx
+
 'use client';
 
 import { use, useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
+import Image from 'next/image';
 import {
-  MapPin, Star, Phone, ArrowLeft,
+  MapPin, Phone, ArrowLeft,
   Package, Loader2, LogOut, Plus,
 } from 'lucide-react';
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
 import { clearUser }                      from '@/store/avatarSlice';
 import { clearFollowing }                 from '@/store/followSlice';
-import ProtectedRoute        from '@/components/ProtectedRoute';
-import { clearSavedProduce, markProduceViewed } from '@/store/contentSlice';
+import ProtectedRoute                     from '@/components/ProtectedRoute';
+import { clearSavedProduce, markProduceVisited } from '@/store/contentSlice'; 
 import { useFollow }                      from '@/hooks/useFollow';
-import { formatPrice, formatDate }        from '@/hooks/produceHelpers';
 
 interface GrocerProfile {
-  _id: string; name: string; owner: string; location: string; bio: string;
-  avatar: string; coverImg: string; rating: number; totalReviews: number;
-  yearsActive: number; categories: string[];
-  partnerFarmers: { _id: string; name: string; avatar: string }[];
-  produce: { _id: string; name: string; price: number; unit: string; img: string }[];
+  _id:         string;
+  bio:         string;
+  shopName:    string;
+  location:    { address?: string; coordinates?: number[] };
+  savedProduce: string[];
+  likedProduce: string[];
+  followers:   string[];
+  following:   string[];
+  mediaUrl:    string;
+  cloudinaryId: string;
+  createdAt:   string;
+  updatedAt:   string;
+  userId: {
+    _id:         string;
+    userName:    string;
+    fullName:    string;
+    email:       string;
+    avatar:      string;
+    accountType: string;
+  };
 }
 
 interface DashboardData {
@@ -35,12 +52,20 @@ const STATUS_STYLES: Record<string, string> = {
   Processing: 'bg-[#e8c84a]/20 text-[#8a6a00]',
 };
 
+function formatDate(iso: string) {
+  return new Date(iso).toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' });
+}
+
+function formatPrice(price: number) {
+  return `₹${price.toLocaleString('en-IN')}`;
+}
+
 export default function GrocerProfilePage({ params }: { params: Promise<{ id: string }> }) {
   const router      = useRouter();
   const dispatch    = useAppDispatch();
   const currentUser = useAppSelector((s) => s.avatar.user);
 
-  const { id } = use(params); // ✅ Next.js 15 — params is a Promise
+  const { id } = use(params);
 
   const [grocer,     setGrocer]     = useState<GrocerProfile | null>(null);
   const [dash,       setDash]       = useState<DashboardData | null>(null);
@@ -53,7 +78,7 @@ export default function GrocerProfilePage({ params }: { params: Promise<{ id: st
   useEffect(() => {
     const load = async () => {
       try {
-        const res  = await fetch(`/api/grocer/${id}`);
+        const res  = await fetch(`/api/grocer/profile/${id}`); 
         const data = await res.json();
 
         if (res.status === 401) { router.push('/features/auth/login'); return; }
@@ -104,13 +129,24 @@ export default function GrocerProfilePage({ params }: { params: Promise<{ id: st
     </div>
   );
 
+  const avatar   = grocer.userId?.avatar   || '';
+  const fullName = grocer.userId?.fullName || '';
+  const userName = grocer.userId?.userName || '';
+  const location = grocer.location?.address || '';
+
   return (
     <ProtectedRoute allowedRole="grocer">
     <div className="min-h-screen bg-[#f5f0e8] pt-20">
 
-      <div className="relative w-full h-56 overflow-hidden">
-        <img src={grocer.coverImg} alt={grocer.name} className="w-full h-full object-cover" />
-        <div className="absolute inset-0 bg-[#1a3d2b]/60" />
+      <div className="relative w-full h-56 bg-[#1a3d2b] overflow-hidden">
+        <div className="absolute right-0 top-0 bottom-0 w-40 flex items-center justify-center pointer-events-none overflow-hidden">
+          <span
+            className="text-[8rem] font-black text-white/4 uppercase select-none whitespace-nowrap"
+            style={{ writingMode: 'vertical-rl' }}
+          >
+            {grocer.shopName}
+          </span>
+        </div>
         <div className="absolute top-0 left-0 right-0 h-[3px] bg-[#e8c84a]" />
 
         <Link href="/features/grocer"
@@ -139,20 +175,29 @@ export default function GrocerProfilePage({ params }: { params: Promise<{ id: st
       <div className="max-w-5xl mx-auto px-6">
 
         <div className="relative -mt-14 mb-10 flex items-end gap-5">
-          <div className="relative w-24 h-24 rounded-2xl overflow-hidden border-4 border-[#f5f0e8] shadow-xl flex-shrink-0">
-            <img src={grocer.avatar} alt={grocer.name} className="w-full h-full object-cover" />
+          <div className="relative w-24 h-24 rounded-2xl overflow-hidden border-4 border-[#f5f0e8] shadow-xl flex-shrink-0 bg-[#1a3d2b]/10">
+            {avatar ? (
+              <Image src={avatar} alt={fullName} fill className="object-cover" />
+            ) : (
+              <div className="w-full h-full flex items-center justify-center text-[#1a3d2b] font-black text-4xl">
+                {fullName?.[0] ?? 'G'}
+              </div>
+            )}
             <div className="absolute top-0 left-0 right-0 h-[3px] bg-[#e8c84a]" />
           </div>
 
           <div className="pb-1">
             <p className="text-[10px] font-black uppercase tracking-[0.5em] text-[#e86c2a] mb-0.5">Verified Grocer</p>
-            <h1 className="text-3xl font-black text-[#1a3d2b] uppercase tracking-tight leading-none">{grocer.name}</h1>
+            <h1 className="text-3xl font-black text-[#1a3d2b] uppercase tracking-tight leading-none">
+              {grocer.shopName || fullName}
+            </h1>
             <div className="flex items-center gap-4 mt-2 text-[11px] text-[#8a9a8e]">
-              <span className="flex items-center gap-1"><MapPin size={11} className="text-[#e86c2a]" />{grocer.location}</span>
-              <span className="flex items-center gap-1">
-                <Star size={11} className="fill-[#e86c2a] text-[#e86c2a]" />
-                <b className="text-[#1a3d2b]">{grocer.rating}</b> ({grocer.totalReviews})
-              </span>
+              {location && (
+                <span className="flex items-center gap-1">
+                  <MapPin size={11} className="text-[#e86c2a]" />{location}
+                </span>
+              )}
+              <span>@{userName}</span>
             </div>
           </div>
 
@@ -175,9 +220,9 @@ export default function GrocerProfilePage({ params }: { params: Promise<{ id: st
           {(isOwner && dash?.stats
             ? dash.stats.slice(0, 3).map((s) => ({ label: s.label, val: s.value }))
             : [
-                { label: 'Years Active',   val: grocer.yearsActive },
-                { label: 'Reviews',        val: grocer.totalReviews },
-                { label: 'Partner Farms',  val: grocer.partnerFarmers.length },
+                { label: 'Followers',     val: grocer.followers?.length    ?? 0 },
+                { label: 'Saved Produce', val: grocer.savedProduce?.length ?? 0 },
+                { label: 'Liked Produce', val: grocer.likedProduce?.length ?? 0 },
               ]
           ).map(({ label, val }) => (
             <div key={label} className="bg-white border border-[#d4c9b0] rounded-2xl px-6 py-5 text-center">
@@ -187,44 +232,26 @@ export default function GrocerProfilePage({ params }: { params: Promise<{ id: st
           ))}
         </div>
 
-        <div className="grid grid-cols-12 gap-8 mb-12">
-          <div className="col-span-8">
-            <p className="text-[10px] font-black uppercase tracking-[0.5em] text-[#e86c2a] mb-3">About</p>
-            <p className="text-sm text-[#4a5a4e] leading-relaxed">{grocer.bio}</p>
-          </div>
-          <div className="col-span-4">
-            <p className="text-[10px] font-black uppercase tracking-[0.5em] text-[#e86c2a] mb-3">Partner Farmers</p>
-            <div className="space-y-2">
-              {grocer.partnerFarmers.map((f) => (
-                <Link key={f._id} href={`/features/farmer/${f._id}`}
-                  className="flex items-center gap-3 p-2.5 rounded-xl bg-white border border-[#d4c9b0] hover:border-[#1a3d2b]/40 transition-colors">
-                  <img src={f.avatar} alt={f.name} className="w-8 h-8 rounded-lg object-cover" />
-                  <span className="text-[11px] font-black text-[#1a3d2b] uppercase">{f.name}</span>
-                </Link>
-              ))}
-            </div>
-          </div>
+     
+        <div className="mb-12">
+          <p className="text-[10px] font-black uppercase tracking-[0.5em] text-[#e86c2a] mb-3">About</p>
+          <p className="text-sm text-[#4a5a4e] leading-relaxed">{grocer.bio}</p>
         </div>
 
-        {grocer.produce?.length > 0 && (
+        {grocer.savedProduce?.length > 0 && (
           <div className="mb-12">
-            <h2 className="text-2xl font-black text-[#1a3d2b] uppercase tracking-tight mb-1">Available Produce</h2>
+            <h2 className="text-2xl font-black text-[#1a3d2b] uppercase tracking-tight mb-1">Saved Produce</h2>
             <div className="w-10 h-[2px] mb-8" style={{ background: 'linear-gradient(90deg, #e8c84a, transparent)' }} />
-            <div className="grid grid-cols-3 gap-5">
-              {grocer.produce.map((p) => (
-                <Link key={p._id} href={`/features/produce/${p._id}`}
-                  onClick={() => dispatch(markProduceViewed(p._id))}
-                  className="bg-white border border-[#d4c9b0] rounded-2xl overflow-hidden hover:border-[#1a3d2b]/40 hover:shadow-md transition-all group">
-                  <div className="relative w-full h-36 overflow-hidden">
-                    <img src={p.img} alt={p.name} className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />
-                  </div>
-                  <div className="p-4 flex items-center justify-between">
-                    <div>
-                      <p className="text-[12px] font-black text-[#1a3d2b] uppercase">{p.name}</p>
-                      <p className="text-[10px] text-[#8a9a8e]">₹{p.price} / {p.unit}</p>
-                    </div>
-                    <Package size={14} className="text-[#8a9a8e]" />
-                  </div>
+            <div className="flex flex-wrap gap-3">
+              {grocer.savedProduce.map((produceId) => (
+                <Link
+                  key={produceId}
+                  href={`/features/produce/${produceId}`}
+                  onClick={() => dispatch(markProduceVisited(produceId))} // ✅ fixed name
+                  className="flex items-center gap-2 bg-white border border-[#d4c9b0] rounded-xl px-4 py-2.5 hover:border-[#1a3d2b]/40 hover:shadow-sm transition-all"
+                >
+                  <Package size={13} className="text-[#8a9a8e]" />
+                  <span className="text-[11px] font-black text-[#1a3d2b] uppercase tracking-wide">View Produce</span>
                 </Link>
               ))}
             </div>

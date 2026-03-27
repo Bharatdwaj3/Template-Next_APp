@@ -1,3 +1,5 @@
+//features/buyer/[id]/page.tsx
+
 'use client';
 
 import { use, useEffect, useState } from 'react';
@@ -11,28 +13,31 @@ import {
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
 import { clearUser }                      from '@/store/avatarSlice';
 import { clearFollowing }                 from '@/store/followSlice';
-import ProtectedRoute        from '@/components/ProtectedRoute';
+import ProtectedRoute                     from '@/components/ProtectedRoute';
 import { clearSavedProduce, markProduceVisited } from '@/store/contentSlice';
 
 interface BuyerProfile {
-  id:          string;
-  userName:    string;
-  fullName:    string;
-  email:       string;
-  accountType: string;
-  avatar:      string | null;
+  _id:         string;
+  savedProduce: string[];
+  orderHistory: string[];
+  following:   string[];
+  deliveryAddresses: { label?: string; address?: string; coordinates?: number[] }[];
+  mediaUrl:    string;
+  cloudinaryId: string;
   createdAt:   string;
-  lastLogin:   string;
-  profile: {
-    savedProduce:      string[];
-    following:         string[];
-    deliveryAddresses: { label: string; address: string }[];
-    mediaUrl:          string;
+  updatedAt:   string;
+  userId: {
+    _id:         string;
+    userName:    string;
+    fullName:    string;
+    email:       string;
+    avatar:      string;
+    accountType: string;
   };
 }
 
 interface DashboardData {
-  stats:       { label: string; value: string }[];
+  stats:        { label: string; value: string }[];
   savedProduce: { _id: string; name: string; price: number; unit: string; img: string; isOrganic: boolean }[];
 }
 
@@ -60,7 +65,7 @@ export default function BuyerProfilePage({ params }: { params: Promise<{ id: str
   useEffect(() => {
     const load = async () => {
       try {
-        const res  = await fetch(`/api/buyer/${id}`);
+        const res  = await fetch(`/api/buyer/profile/${id}`);
         const data = await res.json();
 
         if (res.status === 401) { router.push('/features/auth/login'); return; }
@@ -82,7 +87,7 @@ export default function BuyerProfilePage({ params }: { params: Promise<{ id: str
       }
     };
     load();
-  }, [params.id, router, isOwner]);
+  }, [id, router, isOwner]);
 
   const handleLogout = async () => {
     setLoggingOut(true);
@@ -112,21 +117,23 @@ export default function BuyerProfilePage({ params }: { params: Promise<{ id: str
     </div>
   );
 
-  const p = buyer.profile;
+  const avatar   = buyer.userId?.avatar   || '';
+  const fullName = buyer.userId?.fullName || '';
+  const userName = buyer.userId?.userName || '';
 
   return (
     <ProtectedRoute allowedRole="buyer">
     <div className="min-h-screen bg-[#f5f0e8] pt-20">
 
-      {/* Cover — color block since buyers have no coverImg */}
+      {/* Cover */}
       <div className="relative w-full h-56 bg-[#1a3d2b] overflow-hidden">
-        <div className="absolute top-0 left-0 right-0 h-[3px] bg-[#e8c84a]" />
+        <div className="absolute top-0 left-0 right-0 h-0.75 bg-[#e8c84a]" />
         <div className="absolute right-0 top-0 bottom-0 w-32 flex items-center justify-center pointer-events-none overflow-hidden">
           <span
             className="text-[8rem] font-black text-white/4 uppercase select-none whitespace-nowrap"
             style={{ writingMode: 'vertical-rl' }}
           >
-            {buyer.userName}
+            {userName}
           </span>
         </div>
 
@@ -149,30 +156,29 @@ export default function BuyerProfilePage({ params }: { params: Promise<{ id: str
 
       <div className="max-w-5xl mx-auto px-6">
 
-        {/* Profile header */}
         <div className="relative -mt-14 mb-10 flex items-end gap-5">
-          <div className="relative w-24 h-24 rounded-2xl overflow-hidden border-4 border-[#f5f0e8] shadow-xl flex-shrink-0 bg-[#1a3d2b]/10">
-            {buyer.avatar ? (
-              <Image src={buyer.avatar} alt={buyer.fullName} fill className="object-cover" />
+          <div className="relative w-24 h-24 rounded-2xl overflow-hidden border-4 border-[#f5f0e8] shadow-xl shrink-0 bg-[#1a3d2b]/10">
+            {avatar ? (
+              <Image src={avatar} alt={fullName} fill className="object-cover" />
             ) : (
               <div className="w-full h-full flex items-center justify-center text-[#1a3d2b] font-black text-4xl">
-                {buyer.fullName?.[0] ?? 'B'}
+                {fullName?.[0] ?? 'B'}
               </div>
             )}
-            <div className="absolute top-0 left-0 right-0 h-[3px] bg-[#e8c84a]" />
+            <div className="absolute top-0 left-0 right-0 h-0.75 bg-[#e8c84a]" />
           </div>
 
           <div className="pb-1">
             <p className="text-[10px] font-black uppercase tracking-[0.5em] text-[#e86c2a] mb-0.5">Buyer</p>
             <h1 className="text-3xl font-black text-[#1a3d2b] uppercase tracking-tight leading-none">
-              {buyer.fullName}
+              {fullName}
             </h1>
             <div className="flex items-center gap-4 mt-2 text-[11px] text-[#8a9a8e]">
-              <span>@{buyer.userName}</span>
-              {p.deliveryAddresses?.[0] && (
+              <span>@{userName}</span>
+              {buyer.deliveryAddresses?.[0]?.address && (
                 <span className="flex items-center gap-1">
                   <MapPin size={11} className="text-[#e86c2a]" />
-                  {p.deliveryAddresses[0].address}
+                  {buyer.deliveryAddresses[0].address}
                 </span>
               )}
               <span>Joined {formatDate(buyer.createdAt)}</span>
@@ -180,12 +186,11 @@ export default function BuyerProfilePage({ params }: { params: Promise<{ id: str
           </div>
         </div>
 
-        {/* Stats */}
         <div className="grid grid-cols-3 gap-4 mb-10">
           {(dash?.stats ?? [
-            { label: 'Saved Items', value: String(p.savedProduce?.length  ?? 0) },
-            { label: 'Following',   value: String(p.following?.length     ?? 0) },
-            { label: 'Addresses',   value: String(p.deliveryAddresses?.length ?? 0) },
+            { label: 'Saved Items', value: String(buyer.savedProduce?.length      ?? 0) },
+            { label: 'Following',   value: String(buyer.following?.length         ?? 0) },
+            { label: 'Addresses',   value: String(buyer.deliveryAddresses?.length ?? 0) },
           ]).map(({ label, value }) => (
             <div key={label} className="bg-white border border-[#d4c9b0] rounded-2xl px-6 py-5 text-center">
               <p className="text-3xl font-black text-[#1a3d2b]">{value}</p>
@@ -194,14 +199,13 @@ export default function BuyerProfilePage({ params }: { params: Promise<{ id: str
           ))}
         </div>
 
-        {/* Delivery addresses */}
-        {p.deliveryAddresses?.length > 0 && (
+        {buyer.deliveryAddresses?.length > 0 && (
           <div className="mb-10">
             <p className="text-[10px] font-black uppercase tracking-[0.5em] text-[#e86c2a] mb-3">
               Delivery Addresses
             </p>
             <div className="flex flex-wrap gap-2">
-              {p.deliveryAddresses.map((addr, i) => (
+              {buyer.deliveryAddresses.map((addr, i) => (
                 <span
                   key={i}
                   className="flex items-center gap-1.5 text-[10px] font-black uppercase tracking-widest px-3 py-1.5 rounded-full bg-[#1a3d2b]/10 text-[#1a3d2b] border border-[#1a3d2b]/15"
@@ -214,13 +218,12 @@ export default function BuyerProfilePage({ params }: { params: Promise<{ id: str
           </div>
         )}
 
-        {/* Saved produce — only visible to owner via dashboard */}
         {isOwner && dash && dash.savedProduce.length > 0 && (
           <div className="mb-12">
             <h2 className="text-2xl font-black text-[#1a3d2b] uppercase tracking-tight mb-1">
               Saved Produce
             </h2>
-            <div className="w-10 h-[2px] mb-8" style={{ background: 'linear-gradient(90deg, #e8c84a, transparent)' }} />
+            <div className="w-10 h-0.5 mb-8" style={{ background: 'linear-gradient(90deg, #e8c84a, transparent)' }} />
             <div className="grid grid-cols-3 gap-5">
               {dash.savedProduce.map((item) => (
                 <Link
@@ -250,7 +253,6 @@ export default function BuyerProfilePage({ params }: { params: Promise<{ id: str
           </div>
         )}
 
-        {/* Empty saved state for owner */}
         {isOwner && dash && dash.savedProduce.length === 0 && (
           <div className="mb-12 text-center py-16 border border-dashed border-[#d4c9b0] rounded-2xl">
             <ShoppingBag size={28} className="text-[#1a3d2b]/20 mx-auto mb-3" />

@@ -25,7 +25,7 @@ const Navbar = () => {
   const shouldShowGuestUI         = hasMounted && !user && !loading;
 
   return (
-  <nav className="sticky top-0 z-50 bg-[#f5f0e8]/95 backdrop-blur-md border-b border-[#d4c9b0]">
+    <nav className="sticky top-0 z-50 bg-[#f5f0e8]/95 backdrop-blur-md border-b border-[#d4c9b0]">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
           
@@ -36,13 +36,12 @@ const Navbar = () => {
             </span>
           </Link>
 
+          {/* Desktop Navigation */}
           <div className="hidden md:flex items-center gap-8">
             {[
-              { label: 'Explore', href: '/features/produce' },
-                { label: 'Farmers', href: '/features/farmer' },
-                { label: 'Produce', href: '/features/produce' },
-                { label: 'Sellers', href: '/features/grocer' },
-
+              { label: 'Produce', href: '/features/produce' },
+              { label: 'Farmers', href: '/features/farmer' },
+              { label: 'Sellers', href: '/features/grocer' },
             ].map((item) => (
               <Link
                 key={item.label}
@@ -87,7 +86,7 @@ const Navbar = () => {
             </button>
 
             {!hasMounted && (
-              <div className=" h-8 rounded-xl bg-[#1a3d2b]/10 animate-pulse" />
+              <div className="h-8 rounded-xl bg-[#1a3d2b]/10 animate-pulse" />
             )}
 
             {shouldShowAuthenticatedUI ? (
@@ -129,7 +128,7 @@ const Navbar = () => {
                           <Link
                             href={user.accountType === 'buyer' ? `/features/buyer/${user.id}` : `/features/${user.accountType}/${user.id}`}
                             onClick={closeMenu}
-                            className="flex items-center gapd-3 px-4 py-2.5 text-sm text-[#4a5a4e] hover:bg-[#1a3d2b]/5 hover:text-[#1a3d2b] transition-colors"
+                            className="flex items-center gap-3 px-4 py-2.5 text-sm text-[#4a5a4e] hover:bg-[#1a3d2b]/5 hover:text-[#1a3d2b] transition-colors"
                           >
                             Dashboard
                           </Link>
@@ -200,6 +199,7 @@ const Navbar = () => {
           )}
         </AnimatePresence>
 
+        {/* Mobile Menu */}
         <AnimatePresence>
           {isMenuOpen && !user && (
             <motion.div
@@ -209,9 +209,8 @@ const Navbar = () => {
               className="md:hidden border-t border-[#d4c9b0] py-3 overflow-hidden"
             >
               {[
-                { label: 'Explore', href: '/features/produce' },
-                { label: 'Farmers', href: '/features/farmer' },
                 { label: 'Produce', href: '/features/produce' },
+                { label: 'Farmers', href: '/features/farmer' },
                 { label: 'Sellers', href: '/features/grocer' },
               ].map((item) => (
                 <Link

@@ -1,7 +1,8 @@
 import mongoose, { Model, Schema, Document, Types } from 'mongoose';
+import '@/model/user.model';
 
 export interface IBuyer extends Document {
-  userId: Types.ObjectId;
+  userId:       mongoose.Types.ObjectId;
   savedProduce: Types.ObjectId[];
   orderHistory: Types.ObjectId[];
   following: Types.ObjectId[];

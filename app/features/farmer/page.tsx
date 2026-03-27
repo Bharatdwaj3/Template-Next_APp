@@ -1,28 +1,42 @@
+//features/farmer/page.tsx
 
 "use client";
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { MapPin, Star, Leaf, Loader2 } from "lucide-react";
+import { MapPin, Loader2 } from "lucide-react";
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
 import { setSearchQuery } from "@/store/contentSlice";
 import { useFollow } from "@/hooks/useFollow";
 
 interface Farmer {
-  _id:          string;
-  name:         string;
-  farmName:     string;
-  location:     string;
-  rating:       number;
-  reviews:      number;
-  isOrganic:    boolean;
-  specialities: string[];
-  avatar:       string;
+  _id: string;
+  userId: {
+    _id: string;
+    userName: string;
+    fullName: string;  
+    avatar: string;
+  };
+  bio?: string;
+  interests?: string[];
+  farmType?: string[];
+  produce?: string[];
+  location?: { address?: string };
+  followers?: string[];
+  following?: string[];
 }
 
 function FarmerCard({ farmer }: { farmer: Farmer }) {
   const { isFollowing, toggle } = useFollow("farmer", farmer._id);
+  
+  const name = farmer.userId?.fullName || 'Unknown Farmer';
+  const userName = farmer.userId?.userName || '';
+  const avatar = farmer.userId?.avatar || '';
+  const location = farmer.location?.address || '';
+  
+  const specialities = farmer.interests || farmer.farmType || [];
+  
   return (
     <div className="bg-white border border-[#d4c9b0] rounded-2xl p-5 hover:border-[#1a3d2b]/40 hover:shadow-lg transition-all group">
       <div
@@ -31,43 +45,41 @@ function FarmerCard({ farmer }: { farmer: Farmer }) {
       />
       <div className="flex items-start gap-4 mb-4">
         <div className="w-14 h-14 rounded-xl overflow-hidden shrink-0 border border-[#d4c9b0]">
-          <Image src={farmer.avatar} alt={farmer.name} className="w-full h-full object-cover" />
+          {avatar ? (
+            <Image src={avatar} alt={name} width={56} height={56} className="w-full h-full object-cover" />
+          ) : (
+            <div className="w-full h-full flex items-center justify-center bg-[#1a3d2b]/10 text-[#1a3d2b] font-black text-xl">
+              {name[0]}
+            </div>
+          )}
         </div>
         <div className="flex-1 min-w-0">
           <p className="text-[10px] font-black uppercase tracking-widest text-[#e86c2a] mb-0.5">
-            {farmer.farmName}
+            @{userName}
           </p>
           <h3 className="text-[15px] font-black text-[#1a3d2b] uppercase tracking-tight truncate">
-            {farmer.name}
+            {name}
           </h3>
-          <div className="flex items-center gap-1 mt-1">
-            <MapPin size={11} className="text-[#8a9a8e]" />
-            <span className="text-[11px] text-[#8a9a8e]">{farmer.location}</span>
-          </div>
+          {location && (
+            <div className="flex items-center gap-1 mt-1">
+              <MapPin size={11} className="text-[#8a9a8e]" />
+              <span className="text-[11px] text-[#8a9a8e]">{location}</span>
+            </div>
+          )}
         </div>
       </div>
-      <div className="flex items-center justify-between mb-3">
-        <div className="flex items-center gap-1.5">
-          <Star size={12} className="fill-[#e86c2a] text-[#e86c2a]" />
-          <span className="text-[11px] font-black text-[#e86c2a]">{farmer.rating}</span>
-          <span className="text-[10px] text-[#8a9a8e]">({farmer.reviews})</span>
-        </div>
-        {farmer.isOrganic && (
-          <span className="flex items-center gap-1 bg-[#1a3d2b]/10 text-[#1a3d2b] text-[9px] font-black uppercase tracking-widest px-2.5 py-1 rounded-full">
-            <Leaf size={9} /> Organic
-          </span>
-        )}
-      </div>
+      
       <div className="flex flex-wrap gap-1.5 mb-4">
-        {farmer.specialities.map((s) => (
+        {specialities.slice(0, 3).map((s) => (
           <span key={s} className="text-[9px] font-black uppercase tracking-widest px-2.5 py-1 rounded-full bg-[#f5f0e8] text-[#4a5a4e] border border-[#d4c9b0]">
             {s}
           </span>
         ))}
       </div>
+      
       <div className="flex gap-2">
         <Link
-          href={`/features/farmer/${farmer._id}`}
+          href={`/features/farmer/${farmer.userId?._id || farmer._id}`}
           className="flex-1 text-center text-[10px] font-black uppercase tracking-widest py-2 rounded-xl bg-[#1a3d2b] text-[#e8c84a] hover:bg-[#1a3d2b]/90 transition-colors"
         >
           View Profile
@@ -88,25 +100,38 @@ function FarmerCard({ farmer }: { farmer: Farmer }) {
 }
 
 export default function FarmersPage() {
-  const dispatch    = useAppDispatch();
+  const dispatch = useAppDispatch();
   const searchQuery = useAppSelector((s) => s.content.searchQuery);
-
   const [farmers, setFarmers] = useState<Farmer[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetch("/api/farmer")
+    fetch("/api/farmer/profile/")
       .then((res) => res.json())
-      .then((data) => setFarmers(data.success ? data.farmers : []))
-      .catch(() => setFarmers([]))
+      .then((data) => {
+        console.log("Farmers API response:", data);
+        if (data.success && data.farmers) {
+          setFarmers(data.farmers);
+        } else {
+          console.error("No farmers data:", data);
+          setFarmers([]);
+        }
+      })
+      .catch((err) => {
+        console.error("Error fetching farmers:", err);
+        setFarmers([]);
+      })
       .finally(() => setLoading(false));
   }, []);
 
-  const filtered = farmers.filter(
-    (f) =>
-      f.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      f.location.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  const filtered = farmers.filter((f) => {
+    const name = f.userId?.fullName?.toLowerCase() || '';
+    const userName = f.userId?.userName?.toLowerCase() || '';
+    const location = f.location?.address?.toLowerCase() || '';
+    const query = searchQuery.toLowerCase();
+    
+    return name.includes(query) || userName.includes(query) || location.includes(query);
+  });
 
   return (
     <div className="min-h-screen bg-[#f5f0e8] pt-24">
@@ -143,14 +168,20 @@ export default function FarmersPage() {
             <Loader2 className="w-8 h-8 text-[#1a3d2b] animate-spin" />
           </div>
         )}
+        
         {!loading && filtered.length === 0 && (
           <div className="text-center py-24">
-            <p className="text-4xl font-black text-[#1a3d2b]/20 uppercase">No Farmers Found</p>
+            <p className="text-4xl font-black text-[#1a3d2b]/20 uppercase">
+              {searchQuery ? 'No Farmers Found' : 'No Farmers Yet'}
+            </p>
           </div>
         )}
+        
         {!loading && filtered.length > 0 && (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
-            {filtered.map((f) => <FarmerCard key={f._id} farmer={f} />)}
+            {filtered.map((f) => (
+              <FarmerCard key={f._id} farmer={f} />
+            ))}
           </div>
         )}
       </div>

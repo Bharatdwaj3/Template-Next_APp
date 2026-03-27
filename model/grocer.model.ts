@@ -1,4 +1,5 @@
-import { Schema, model } from 'mongoose';
+import { Schema, model, models } from 'mongoose';
+import '@/model/user.model';
 
 const grocerSchema = new Schema(
   {
@@ -51,4 +52,4 @@ const grocerSchema = new Schema(
   { timestamps: true },
 );
 
-export default model('Grocer', grocerSchema, 'grocers');
+export default models.Grocer ?? model('Grocer', grocerSchema, 'grocers');

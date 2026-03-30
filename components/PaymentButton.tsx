@@ -1,9 +1,9 @@
 // components/PaymentButton.tsx
-
 'use client';
 
 import { useState } from 'react';
-import { CreditCard, Loader2 } from 'lucide-react';
+import { useRouter } from 'next/navigation';
+import { CreditCard, CheckCircle, XCircle, Loader2 } from 'lucide-react';
 
 interface PaymentButtonProps {
   cartItems: Array<{
@@ -40,7 +40,10 @@ export default function PaymentButton({
   onFailure,
   className = '',
 }: PaymentButtonProps) {
+  const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
+  const [paymentStatus, setPaymentStatus] = useState<'idle' | 'loading' | 'success' | 'error'>('idle');
+  const [errorMessage, setErrorMessage] = useState('');
 
   const loadRazorpayScript = (): Promise<boolean> => {
     return new Promise((resolve) => {
@@ -57,12 +60,80 @@ export default function PaymentButton({
     });
   };
 
+  const handlePaymentSuccess = async (response: any) => {
+    try {
+      setIsLoading(true);
+      setPaymentStatus('loading');
+
+      const verificationResult = await fetch('/api/payments/verify', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          razorpay_order_id: response.razorpay_order_id,
+          razorpay_payment_id: response.razorpay_payment_id,
+          razorpay_signature: response.razorpay_signature,
+          cartItems,
+          customerInfo,
+          amount,
+        }),
+      });
+
+      const data = await verificationResult.json();
+
+      if (data.success) {
+        setPaymentStatus('success');
+        if (onSuccess) onSuccess();
+      } else {
+        throw new Error(data.message || 'Payment verification failed');
+      }
+    } catch (error: any) {
+      console.error('Payment verification error:', error);
+      setPaymentStatus('error');
+      setErrorMessage(error.message || 'Verification failed');
+      if (onFailure) onFailure(error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handlePaymentFailure = async (response: any) => {
+    try {
+      console.log('Payment failed:', response);
+      await fetch('/api/payments/failure', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          order_id: response.error?.metadata?.order_id,
+          payment_id: response.error?.metadata?.payment_id,
+          error_code: response.error?.code,
+          error_description: response.error?.description,
+        }),
+      });
+
+      setPaymentStatus('error');
+      setErrorMessage(response.error?.description || 'Payment failed');
+      if (onFailure) onFailure(response.error);
+    } catch (error) {
+      console.error('Error handling payment failure:', error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   const handlePayment = async () => {
     try {
       setIsLoading(true);
+      setPaymentStatus('loading');
+      setErrorMessage('');
 
       if (!cartItems?.length) {
         throw new Error('Cart is empty!');
+      }
+      if (!customerInfo?.name || !customerInfo?.email) {
+        throw new Error('Customer information is required!');
+      }
+      if (!amount || amount <= 0) {
+        throw new Error('Invalid payment amount!');
       }
 
       const scriptLoaded = await loadRazorpayScript();
@@ -70,8 +141,7 @@ export default function PaymentButton({
         throw new Error('Unable to load payment gateway');
       }
 
-      console.log('Creating order with:', { amount, cartItems, customerInfo });
-
+      console.log('Creating order...', { amount, cartItems, customerInfo });
       
       const orderResponse = await fetch('/api/payments/create-order', {
         method: 'POST',
@@ -80,7 +150,6 @@ export default function PaymentButton({
       });
 
       const orderData = await orderResponse.json();
-      console.log('Order response:', orderData);
 
       if (!orderData.success) {
         throw new Error(orderData.message || 'Failed to create order');
@@ -106,59 +175,98 @@ export default function PaymentButton({
           ondismiss: () => {
             console.log('Payment modal dismissed');
             setIsLoading(false);
+            setPaymentStatus('idle');
           },
         },
-        handler: async (response: any) => {
-          console.log('Payment success response:', response);
-          
-          
-          const verifyResponse = await fetch('/api/payments/verify', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              razorpay_order_id: response.razorpay_order_id,
-              razorpay_payment_id: response.razorpay_payment_id,
-              razorpay_signature: response.razorpay_signature,
-              cartItems,
-              customerInfo,
-              amount,
-            }),
-          });
-
-          const verifyData = await verifyResponse.json();
-          console.log('Verify response:', verifyData);
-
-          if (verifyData.success) {
-            if (onSuccess) onSuccess();
-          } else {
-            throw new Error(verifyData.message || 'Payment verification failed');
-          }
-          setIsLoading(false);
+        handler: handlePaymentSuccess,
+        retry: {
+          enabled: true,
+          max_count: 3,
         },
       };
 
       const razorpay = new window.Razorpay(options);
+      razorpay.on('payment.failed', handlePaymentFailure);
       razorpay.open();
     } catch (error: any) {
-      console.error('Payment error:', error);
-      alert(error.message || 'Payment failed. Please try again.');
-      if (onFailure) onFailure(error);
+      console.error('Payment initialization error:', error);
       setIsLoading(false);
+      setPaymentStatus('error');
+      setErrorMessage(error.message || 'Payment failed');
+      if (onFailure) onFailure(error);
     }
   };
 
+  const retryPayment = () => {
+    setPaymentStatus('idle');
+    setErrorMessage('');
+    handlePayment();
+  };
+
+  const getButtonText = () => {
+    if (isLoading) return 'Processing...';
+    if (paymentStatus === 'success') return 'Payment Completed';
+    return `Pay ₹${amount.toFixed(2)}`;
+  };
+
+  const getButtonColor = () => {
+    if (paymentStatus === 'success') return 'bg-green-600 hover:bg-green-700';
+    return 'bg-[#1a3d2b] hover:bg-[#2a5a3b]';
+  };
+
   return (
-    <button
-      onClick={handlePayment}
-      disabled={isLoading}
-      className={`w-full flex items-center justify-center gap-2 bg-[#1a3d2b] text-[#e8c84a] font-bold py-3 px-4 rounded-xl hover:bg-[#2a5a3b] transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed ${className}`}
-    >
-      {isLoading ? (
-        <Loader2 className="animate-spin" size={20} />
-      ) : (
-        <CreditCard size={20} />
+    <div className="w-full">
+      {paymentStatus === 'loading' && (
+        <div className="flex items-center gap-2 mb-4 text-blue-600">
+          <Loader2 className="animate-spin" size={20} />
+          <span>Processing payment...</span>
+        </div>
       )}
-      {isLoading ? 'Processing...' : `Pay ₹${amount.toFixed(2)}`}
-    </button>
+
+      {paymentStatus === 'success' && (
+        <div className="flex items-center gap-2 mb-4 p-3 bg-green-50 text-green-700 rounded-lg">
+          <CheckCircle size={20} />
+          <span>Payment completed successfully!</span>
+        </div>
+      )}
+
+      {paymentStatus === 'error' && (
+        <div className="flex items-center justify-between mb-4 p-3 bg-red-50 text-red-700 rounded-lg">
+          <div className="flex items-center gap-2">
+            <XCircle size={20} />
+            <span>{errorMessage || 'Payment failed. Please try again.'}</span>
+          </div>
+          <button
+            onClick={retryPayment}
+            disabled={isLoading}
+            className="text-sm font-medium text-red-700 hover:text-red-900 underline"
+          >
+            Retry
+          </button>
+        </div>
+      )}
+
+      <button
+        onClick={handlePayment}
+        disabled={isLoading || paymentStatus === 'success'}
+        className={`w-full flex items-center justify-center gap-2 text-white font-bold py-3 px-4 rounded-xl transition-all duration-300 ${getButtonColor()} disabled:opacity-50 disabled:cursor-not-allowed ${className}`}
+      >
+        {isLoading ? (
+          <Loader2 className="animate-spin" size={20} />
+        ) : paymentStatus === 'success' ? (
+          <CheckCircle size={20} />
+        ) : (
+          <CreditCard size={20} />
+        )}
+        {getButtonText()}
+      </button>
+
+      <div className="mt-4 text-center">
+        <p className="text-xs text-gray-500">Secure payment powered by Razorpay</p>
+        <p className="text-xs text-gray-400 mt-1">
+          We accept all major credit cards, debit cards, net banking, UPI & wallets
+        </p>
+      </div>
+    </div>
   );
 }

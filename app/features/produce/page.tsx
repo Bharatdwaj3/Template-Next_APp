@@ -1,6 +1,7 @@
 // app/features/produce/page.tsx
 
 'use client';
+
 import { useEffect, useState } from 'react';
 import { ProduceGrid, type Produce } from '@/components/ProduceGrid';
 import { useCartContext } from '@/hooks/useCartContext';

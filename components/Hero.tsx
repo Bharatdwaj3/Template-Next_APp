@@ -61,7 +61,7 @@ export const Hero = () => {
 
         <div className="flex flex-col gap-5">
           <Link
-            href="/explore"
+            href="/features/produce"
             className="group flex items-center gap-3 w-fit bg-[#e86c2a] text-white text-[11px] font-black uppercase tracking-widest px-7 py-3.5 rounded-full hover:bg-[#d45e1e] transition-colors shadow-lg"
           >
             Discover Farmers

@@ -102,7 +102,6 @@ export default function ProduceDetailPage() {
   return (
     <div className="min-h-screen bg-[#f5f0e8] pt-24">
       <div className="max-w-6xl mx-auto px-6">
-        {/* Back button */}
         <Link
           href="/features/produce"
           className="inline-flex items-center gap-2 text-[11px] font-black uppercase tracking-widest text-[#4a5a4e] hover:text-[#1a3d2b] mb-6 transition-colors"
@@ -112,7 +111,6 @@ export default function ProduceDetailPage() {
 
         <div className="bg-white border border-[#d4c9b0] rounded-2xl overflow-hidden">
           <div className="grid md:grid-cols-2 gap-8 p-6 md:p-8">
-            {/* Image */}
             <div className="relative h-80 md:h-96 bg-[#f5f0e8] rounded-xl overflow-hidden">
               {produce.img ? (
                 <Image
@@ -133,7 +131,6 @@ export default function ProduceDetailPage() {
               )}
             </div>
 
-            {/* Details */}
             <div>
               <div className="mb-4">
                 <p className="text-[10px] font-black uppercase tracking-widest text-[#e86c2a] mb-1">

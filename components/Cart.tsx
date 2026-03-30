@@ -1,9 +1,10 @@
+// components/Cart.tsx
 'use client';
 
 import { motion, AnimatePresence } from 'framer-motion';
 import Image from 'next/image';
 import { X, ShoppingBasket, Trash2, Plus, Minus, ArrowRight } from 'lucide-react';
-import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { type Produce } from './ProduceCard';
 
 export interface CartItem extends Produce {
@@ -20,29 +21,35 @@ interface CartProps {
 }
 
 export const Cart = ({ isOpen, onClose, items, onIncrement, onDecrement, onRemove }: CartProps) => {
+  const router = useRouter();
   const total = items.reduce((sum, item) => sum + item.price * item.quantity, 0);
   const itemCount = items.reduce((sum, item) => sum + item.quantity, 0);
+
+  const handleCheckout = () => {
+    onClose();
+    sessionStorage.setItem('checkoutCart', JSON.stringify(items));
+    sessionStorage.setItem('checkoutTotal', total.toString());
+    router.push('/features/checkout');
+  };
 
   return (
     <AnimatePresence>
       {isOpen && (
         <>
-
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            onClick={onClose}
-            className="fixed inset-0 bg-[#1a3d2b]/40 backdrop-blur-sm z-40"
-          />
-
-          <motion.div
-            initial={{ x: '100%' }}
-            animate={{ x: 0 }}
-            exit={{ x: '100%' }}
-            transition={{ type: 'spring', damping: 28, stiffness: 300 }}
-            className="fixed right-0 top-0 bottom-0 w-full max-w-md bg-[#f5f0e8] z-50 flex flex-col shadow-2xl"
-          >
+         <motion.div
+  initial={{ opacity: 0 }}
+  animate={{ opacity: 1 }}
+  exit={{ opacity: 0 }}
+  onClick={onClose}
+  className="fixed inset-0 bg-[#1a3d2b]/40 backdrop-blur-sm z-[100]" // Was z-40
+/>
+<motion.div
+  initial={{ x: '100%' }}
+  animate={{ x: 0 }}
+  exit={{ x: '100%' }}
+  transition={{ type: 'spring', damping: 28, stiffness: 300 }}
+  className="fixed right-0 top-0 bottom-0 w-full max-w-md bg-[#f5f0e8] z-[101] flex flex-col shadow-2xl" // Was z-50
+>
             <div className="absolute top-0 left-0 right-0 h-0.75 bg-[#e8c84a]" />
 
             <div className="flex items-center justify-between px-6 py-5 border-b border-[#d4c9b0]">
@@ -96,7 +103,6 @@ export const Cart = ({ isOpen, onClose, items, onIncrement, onDecrement, onRemov
                       </p>
                       <p className="text-[10px] text-[#8a9a8e] mb-2">{item.grower}</p>
                       <div className="flex items-center justify-between">
-                        
                         <div className="flex items-center gap-2 bg-[#f5f0e8] rounded-lg p-1">
                           <button
                             onClick={() => onDecrement(item.id)}
@@ -118,7 +124,6 @@ export const Cart = ({ isOpen, onClose, items, onIncrement, onDecrement, onRemov
                       </div>
                     </div>
 
-                   
                     <button
                       onClick={() => onRemove(item.id)}
                       className="self-start p-1.5 hover:bg-[#e86c2a]/10 rounded-lg transition-colors group"
@@ -136,13 +141,12 @@ export const Cart = ({ isOpen, onClose, items, onIncrement, onDecrement, onRemov
                   <p className="text-[11px] font-black uppercase tracking-widest text-[#8a9a8e]">Total</p>
                   <p className="text-2xl font-black text-[#1a3d2b]">₹{total.toFixed(0)}</p>
                 </div>
-                <Link
-                  href="/checkout"
-                  onClick={onClose}
+                <button
+                  onClick={handleCheckout}
                   className="flex items-center justify-center gap-2 w-full bg-[#1a3d2b] text-[#e8c84a] text-[11px] font-black uppercase tracking-widest py-4 rounded-xl hover:bg-[#1a3d2b]/90 transition-colors"
                 >
                   Proceed to Checkout <ArrowRight size={14} />
-                </Link>
+                </button>
                 <button
                   onClick={onClose}
                   className="w-full text-[10px] font-black uppercase tracking-widest text-[#8a9a8e] hover:text-[#1a3d2b] transition-colors"

@@ -1,105 +1,274 @@
+// components/ProduceCard.tsx
 'use client';
-
-import { motion } from 'framer-motion';
+import { useState } from 'react';
 import Image from 'next/image';
-import { Star, ShoppingBasket, Leaf } from 'lucide-react';
+import Link from 'next/link';
+import { motion, AnimatePresence } from 'framer-motion';
+import { 
+  ShoppingBasket, 
+  Leaf, 
+  Star, 
+  Eye, 
+  MapPin,
+  Clock,
+  Package
+} from 'lucide-react';
+import { useCartContext } from '@/hooks/useCartContext';
 
 export interface Produce {
-  id: string;
+  _id: string;
   name: string;
-  grower: string;
-  location: string;
+  description: string;
   price: number;
   unit: string;
-  rating: number;
-  reviews: number;
+  stock: number;
   category: string;
-  isOrganic: boolean;
-  isSeasonal: boolean;
   img: string;
+  isOrganic: boolean;
+  rating: number;
+  totalReviews: number;
+  farmerId: {
+    _id: string;
+    userName: string;
+    fullName: string;
+    avatar: string;
+  };
+  createdAt: string;
 }
 
 interface ProduceCardProps {
   produce: Produce;
-  onAddToCart: (produce: Produce) => void;
+  onAddToCart: (item: any) => void;
 }
 
-// ✅ Fix: Export the component correctly
-export function ProduceCard({ produce, onAddToCart }: ProduceCardProps) {
+export const ProduceCard = ({ produce, onAddToCart }: ProduceCardProps) => {
+  const [isHovered, setIsHovered] = useState(false);
+  const [isAdding, setIsAdding] = useState(false);
+
+  const handleAddToCart = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setIsAdding(true);
+    onAddToCart({
+      id: produce._id,
+      name: produce.name,
+      price: produce.price,
+      quantity: 1,
+      unit: produce.unit,
+      img: produce.img,
+      grower: produce.farmerId.fullName,
+      farmerId: produce.farmerId._id,
+    });
+    setTimeout(() => setIsAdding(false), 500);
+  };
+
+  const formatDate = (dateString: string) => {
+    const date = new Date(dateString);
+    const now = new Date();
+    const diffInHours = Math.floor((now.getTime() - date.getTime()) / (1000 * 60 * 60));
+    
+    if (diffInHours < 24) {
+      return `${diffInHours}h ago`;
+    }
+    const diffInDays = Math.floor(diffInHours / 24);
+    return `${diffInDays}d ago`;
+  };
+
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 16 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true }}
-      whileHover={{ y: -4 }}
-      transition={{ duration: 0.2 }}
-      className="bg-white border border-[#d4c9b0] rounded-2xl overflow-hidden group hover:border-[#1a3d2b]/40 hover:shadow-xl transition-all"
-    >
-      <div className="relative w-full h-44 overflow-hidden">
-        <Image
-          src={produce.img}
-          alt={produce.name}
-          fill
-          className="object-cover group-hover:scale-105 transition-transform duration-500"
-        />
-        <div className="absolute top-0 left-0 right-0 h-0.5 bg-[#e8c84a] opacity-0 group-hover:opacity-100 transition-opacity" />
-
-        <div className="absolute top-3 left-3 flex flex-col gap-1.5">
-          {produce.isOrganic && (
-            <span className="flex items-center gap-1 bg-[#1a3d2b] text-[#e8c84a] text-[9px] font-black uppercase tracking-widest px-2.5 py-1 rounded-full">
-              <Leaf size={9} /> Organic
-            </span>
+    <Link href={`/features/produce/${produce._id}`} className="block">
+      <motion.div
+        className="bg-white border border-[#d4c9b0] rounded-2xl overflow-hidden hover:border-[#1a3d2b]/40 hover:shadow-xl transition-all duration-300 group relative"
+        onMouseEnter={() => setIsHovered(true)}
+        onMouseLeave={() => setIsHovered(false)}
+        whileHover={{ y: -4 }}
+      >
+        {/* Image Container */}
+        <div className="relative h-64 bg-[#f5f0e8] overflow-hidden">
+          {produce.img ? (
+            <Image
+              src={produce.img}
+              alt={produce.name}
+              fill
+              className="object-cover group-hover:scale-110 transition-transform duration-500"
+            />
+          ) : (
+            <div className="w-full h-full flex items-center justify-center">
+              <Package size={64} className="text-[#8a9a8e]" />
+            </div>
           )}
-          {produce.isSeasonal && (
-            <span className="bg-[#e86c2a] text-white text-[9px] font-black uppercase tracking-widest px-2.5 py-1 rounded-full">
-              In Season
-            </span>
-          )}
-        </div>
-      </div>
-
-      <div className="p-4">
-        <p className="text-[9px] font-black uppercase tracking-[0.4em] text-[#8a9a8e] mb-1">
-          {produce.category}
-        </p>
-
-        <h3 className="text-[15px] font-black text-[#1a3d2b] uppercase tracking-tight leading-tight mb-1">
-          {produce.name}
-        </h3>
-
-        <p className="text-[10px] text-[#8a9a8e] mb-3">
-          by <span className="font-bold text-[#4a5a4e]">{produce.grower}</span> · {produce.location}
-        </p>
-
-        <div className="flex items-center gap-1.5 mb-4">
-          <div className="flex gap-0.5">
-            {Array.from({ length: 5 }).map((_, i) => (
-              <Star
-                key={i}
-                size={11}
-                className={i < Math.round(produce.rating) ? 'fill-[#e86c2a] text-[#e86c2a]' : 'text-[#d4c9b0]'}
-              />
-            ))}
+          
+          {/* Badges */}
+          <div className="absolute top-3 left-3 flex flex-col gap-2">
+            {produce.isOrganic && (
+              <span className="flex items-center gap-1 bg-[#1a3d2b] text-[#e8c84a] text-[9px] font-black px-2.5 py-1 rounded-full">
+                <Leaf size={10} /> ORGANIC
+              </span>
+            )}
+            {produce.stock <= 10 && produce.stock > 0 && (
+              <span className="bg-orange-100 text-orange-700 text-[9px] font-black px-2.5 py-1 rounded-full">
+                LOW STOCK
+              </span>
+            )}
+            {produce.stock === 0 && (
+              <span className="bg-red-100 text-red-700 text-[9px] font-black px-2.5 py-1 rounded-full">
+                OUT OF STOCK
+              </span>
+            )}
           </div>
-          <span className="text-[10px] font-bold text-[#e86c2a]">{produce.rating}</span>
-          <span className="text-[10px] text-[#8a9a8e]">({produce.reviews})</span>
-        </div>
 
-        <div className="flex items-center justify-between">
-          <div>
-            <span className="text-xl font-black text-[#1a3d2b]">₹{produce.price}</span>
-            <span className="text-[10px] text-[#8a9a8e] ml-1">/ {produce.unit}</span>
-          </div>
-          <motion.button
-            whileTap={{ scale: 0.95 }}
-            onClick={() => onAddToCart(produce)}
-            className="flex items-center gap-2 bg-[#1a3d2b] text-[#e8c84a] text-[10px] font-black uppercase tracking-widest px-4 py-2.5 rounded-xl hover:bg-[#1a3d2b]/90 transition-colors"
+          {/* Quick View Button */}
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: isHovered ? 1 : 0 }}
+            className="absolute top-3 right-3"
           >
-            <ShoppingBasket size={13} />
-            Add
-          </motion.button>
+            <div className="bg-white/90 backdrop-blur-sm p-2 rounded-full shadow-lg">
+              <Eye size={14} className="text-[#1a3d2b]" />
+            </div>
+          </motion.div>
         </div>
-      </div>
-    </motion.div>
+
+        {/* Content */}
+        <div className="p-5">
+          {/* Category */}
+          <p className="text-[9px] font-black uppercase tracking-widest text-[#e86c2a] mb-1">
+            {produce.category}
+          </p>
+
+          {/* Title */}
+          <h3 className="text-lg font-black text-[#1a3d2b] uppercase tracking-tight mb-2 line-clamp-1">
+            {produce.name}
+          </h3>
+
+          {/* Farmer Info */}
+          <div className="flex items-center gap-2 mb-3">
+            {produce.farmerId.avatar ? (
+              <Image
+                src={produce.farmerId.avatar}
+                alt={produce.farmerId.fullName}
+                width={20}
+                height={20}
+                className="rounded-full object-cover"
+              />
+            ) : (
+              <div className="w-5 h-5 rounded-full bg-[#1a3d2b]/10 flex items-center justify-center">
+                <span className="text-[8px] font-black text-[#1a3d2b]">
+                  {produce.farmerId.fullName?.[0]}
+                </span>
+              </div>
+            )}
+            <span className="text-[10px] text-[#8a9a8e]">
+              by {produce.farmerId.fullName}
+            </span>
+          </div>
+
+          {/* Rating */}
+          <div className="flex items-center gap-1 mb-3">
+            <Star size={12} className="fill-[#e86c2a] text-[#e86c2a]" />
+            <span className="text-sm font-bold text-[#e86c2a]">
+              {produce.rating || 0}
+            </span>
+            <span className="text-[10px] text-[#8a9a8e]">
+              ({produce.totalReviews || 0} reviews)
+            </span>
+          </div>
+
+          {/* Price and Add Button */}
+          <div className="flex items-center justify-between">
+            <div>
+              <span className="text-2xl font-black text-[#e86c2a]">
+                ₹{produce.price}
+              </span>
+              <span className="text-[10px] text-[#8a9a8e] ml-1">
+                /{produce.unit}
+              </span>
+            </div>
+            
+            <motion.button
+              onClick={handleAddToCart}
+              disabled={produce.stock === 0 || isAdding}
+              className={`flex items-center gap-1.5 px-4 py-2 rounded-xl font-bold text-[10px] uppercase tracking-wider transition-all ${
+                produce.stock === 0
+                  ? 'bg-[#d4c9b0] text-[#8a9a8e] cursor-not-allowed'
+                  : isAdding
+                  ? 'bg-[#2a5a3b] text-[#e8c84a]'
+                  : 'bg-[#1a3d2b] text-[#e8c84a] hover:bg-[#2a5a3b]'
+              }`}
+              whileTap={{ scale: 0.95 }}
+            >
+              {isAdding ? (
+                <>
+                  <motion.div
+                    animate={{ rotate: 360 }}
+                    transition={{ duration: 0.5, repeat: Infinity, ease: "linear" }}
+                    className="w-3 h-3 border-2 border-[#e8c84a] border-t-transparent rounded-full"
+                  />
+                  Added
+                </>
+              ) : (
+                <>
+                  <ShoppingBasket size={12} />
+                  Add
+                </>
+              )}
+            </motion.button>
+          </div>
+        </div>
+
+        {/* Hover Overlay - Quick Review */}
+        <AnimatePresence>
+          {isHovered && (
+            <motion.div
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: 10 }}
+              className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-[#1a3d2b] via-[#1a3d2b]/95 to-transparent p-5 pt-16"
+            >
+              {/* Description */}
+              <p className="text-[11px] text-white/90 mb-3 line-clamp-2 leading-relaxed">
+                {produce.description || 'Fresh organic produce from local farms'}
+              </p>
+
+              {/* Quick Stats */}
+              <div className="flex items-center gap-4 mb-3">
+                <div className="flex items-center gap-1">
+                  <Clock size={11} className="text-[#e8c84a]" />
+                  <span className="text-[9px] text-white/80">
+                    Listed {formatDate(produce.createdAt)}
+                  </span>
+                </div>
+                <div className="flex items-center gap-1">
+                  <Package size={11} className="text-[#e8c84a]" />
+                  <span className="text-[9px] text-white/80">
+                    {produce.stock} {produce.unit} available
+                  </span>
+                </div>
+              </div>
+
+              {/* Stock Status */}
+              <div className="flex items-center justify-between">
+                <div className={`text-[9px] font-black uppercase tracking-wider px-2 py-1 rounded ${
+                  produce.stock > 10
+                    ? 'bg-green-500/20 text-green-300'
+                    : produce.stock > 0
+                    ? 'bg-orange-500/20 text-orange-300'
+                    : 'bg-red-500/20 text-red-300'
+                }`}>
+                  {produce.stock > 10
+                    ? 'In Stock'
+                    : produce.stock > 0
+                    ? `Only ${produce.stock} left`
+                    : 'Out of Stock'}
+                </div>
+                
+                <span className="text-[9px] text-white/60 uppercase tracking-wider">
+                  Click for details →
+                </span>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </motion.div>
+    </Link>
   );
-}
+};

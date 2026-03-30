@@ -1,7 +1,5 @@
 // features/farmer/[id]/page.tsx
 
-// features/farmer/[id]/page.tsx
-
 'use client';
 import React, { use, useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
@@ -151,36 +149,31 @@ export default function FarmerProfilePage({ params }: { params: Promise<{ id: st
       } else if (el.type === 'checkbox') {
         const value = el.checked ? 'true' : 'false';
         formData.append(el.name, value);
-        console.log(`☑️ Checkbox: ${el.name} = ${value}`);
+        console.log(`Checkbox: ${el.name} = ${value}`);
       } else if (el.value !== '') {
         formData.append(el.name, el.value);
-        console.log(`📝 Field: ${el.name} = ${el.value}`);
       } else {
-        console.log(`⚠️ Empty field: ${el.name}`);
+        console.log(`Empty field: ${el.name}`);
       }
     });
 
     console.log('=== ALL FORM DATA ENTRIES ===');
-    for (let pair of formData.entries()) {
+    for (const pair of formData.entries()) {
       console.log(pair[0], '=', pair[1]);
     }
 
     try {
-      console.log('🚀 Sending request...');
+      console.log('Sending request...');
       const res = await fetch('/api/produce/details/', {
         method: 'POST',
         body: formData,
       });
       
-      console.log('📡 Response status:', res.status);
       const data = await res.json();
-      console.log('📦 Response:', data);
       
       if (data.success) {
-        console.log('✅ Success!');
         setShowCreateModal(false);
         
-        // Clear form
         if (formRef.current) {
           const formInputs = formRef.current.querySelectorAll('input, select, textarea');
           formInputs.forEach((el: any) => {
@@ -194,7 +187,6 @@ export default function FarmerProfilePage({ params }: { params: Promise<{ id: st
           });
         }
         
-        // Refresh data
         const farmerRes = await fetch(`/api/farmer/profile/${id}`);
         const farmerData = await farmerRes.json();
         if (farmerData.success) setFarmer(farmerData.farmer);
@@ -257,8 +249,7 @@ export default function FarmerProfilePage({ params }: { params: Promise<{ id: st
   return (
     <ProtectedRoute>
       <div className="min-h-screen bg-[#f5f0e8]">
-        {/* Header */}
-        <div className="relative h-48 bg-gradient-to-r from-[#1a3d2b] to-[#2a5a3b]">
+        <div className="relative h-48 bg-linear-to-r from-[#1a3d2b] to-[#2a5a3b]">
           <span
             className="text-[8rem] font-black text-white/10 uppercase select-none whitespace-nowrap absolute right-4 top-1/2 -translate-y-1/2"
             style={{ writingMode: 'vertical-rl' }}
@@ -553,7 +544,6 @@ export default function FarmerProfilePage({ params }: { params: Promise<{ id: st
                   />
                 </div>
 
-                {/* Price and Unit */}
                 <div className="grid grid-cols-2 gap-4">
                   <div>
                     <label className="block text-[10px] font-black uppercase tracking-wider text-[#000000] mb-2">
@@ -586,7 +576,6 @@ export default function FarmerProfilePage({ params }: { params: Promise<{ id: st
                   </div>
                 </div>
 
-                {/* Category */}
                 <div>
                   <label className="block text-[10px] font-black uppercase tracking-wider text-[#000000] mb-2">
                     Category *
@@ -606,7 +595,6 @@ export default function FarmerProfilePage({ params }: { params: Promise<{ id: st
                   </select>
                 </div>
 
-                {/* Stock Quantity */}
                 <div>
                   <label className="block text-[10px] font-black uppercase tracking-wider text-[#000000] mb-2">
                     Stock Quantity
@@ -620,7 +608,6 @@ export default function FarmerProfilePage({ params }: { params: Promise<{ id: st
                   />
                 </div>
 
-                {/* Description */}
                 <div>
                   <label className="block text-[10px] font-black uppercase tracking-wider text-[#000000] mb-2">
                     Description
@@ -633,7 +620,6 @@ export default function FarmerProfilePage({ params }: { params: Promise<{ id: st
                   />
                 </div>
 
-                {/* Organic Checkbox */}
                 <div className="flex items-center gap-2">
                   <input
                     type="checkbox"
@@ -646,7 +632,6 @@ export default function FarmerProfilePage({ params }: { params: Promise<{ id: st
                   </label>
                 </div>
 
-                {/* Product Image */}
                 <div>
                   <label className="block text-[10px] font-black uppercase tracking-wider text-[#000000] mb-2">
                     Product Image
@@ -659,7 +644,6 @@ export default function FarmerProfilePage({ params }: { params: Promise<{ id: st
                   />
                 </div>
 
-                {/* Buttons */}
                 <div className="flex gap-3 pt-4">
                   <button
                     type="button"

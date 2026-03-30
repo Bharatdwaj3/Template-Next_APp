@@ -1,29 +1,20 @@
+// hooks/useCartContext.tsx
 'use client';
 
 import { createContext, useContext, ReactNode } from 'react';
-import { useCart, type CartItem } from '@/hooks/useCart';
-//import type { Produce } from '@/components/ProduceCard';
-
-export interface Produce {
-  id:       string;
-  name:     string;
-  price:    number;
-  unit:     string;
-  grower:   string;
-  location: string;
-  rating:   number;
-  img:      string;
-}
+import { useCart, type CartItem, type Produce } from './useCart';
 
 interface CartContextValue {
-  items:       CartItem[];
-  isOpen:      boolean;
-  total:       number;
-  setIsOpen:   (v: boolean) => void;
-  addToCart:   (p: Produce) => void;
-  increment:   (id: string) => void;
-  decrement:   (id: string) => void;
-  remove:      (id: string) => void;
+  items: CartItem[];
+  isOpen: boolean;
+  total: number;
+  itemCount: number;
+  setIsOpen: (v: boolean) => void;
+  addToCart: (p: Produce) => void;
+  increment: (id: string) => void;
+  decrement: (id: string) => void;
+  remove: (id: string) => void;
+  clearCart: () => void;
 }
 
 const CartContext = createContext<CartContextValue | null>(null);

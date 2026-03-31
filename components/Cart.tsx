@@ -5,11 +5,8 @@ import { motion, AnimatePresence } from 'framer-motion';
 import Image from 'next/image';
 import { X, ShoppingBasket, Trash2, Plus, Minus, ArrowRight } from 'lucide-react';
 import { useRouter } from 'next/navigation';
-import { type Produce } from './ProduceCard';
-
-export interface CartItem extends Produce {
-  quantity: number;
-}
+export type { CartItem } from '@/hooks/useCart';
+import type { CartItem } from '@/hooks/useCart';
 
 interface CartProps {
   isOpen: boolean;
@@ -41,14 +38,14 @@ export const Cart = ({ isOpen, onClose, items, onIncrement, onDecrement, onRemov
   animate={{ opacity: 1 }}
   exit={{ opacity: 0 }}
   onClick={onClose}
-  className="fixed inset-0 bg-[#1a3d2b]/40 backdrop-blur-sm z-[100]" // Was z-40
+  className="fixed inset-0 bg-[#1a3d2b]/40 backdrop-blur-sm z-100" 
 />
 <motion.div
   initial={{ x: '100%' }}
   animate={{ x: 0 }}
   exit={{ x: '100%' }}
   transition={{ type: 'spring', damping: 28, stiffness: 300 }}
-  className="fixed right-0 top-0 bottom-0 w-full max-w-md bg-[#f5f0e8] z-[101] flex flex-col shadow-2xl" // Was z-50
+  className="fixed right-0 top-0 bottom-0 w-full max-w-md bg-[#f5f0e8] z-101 flex flex-col shadow-2xl"
 >
             <div className="absolute top-0 left-0 right-0 h-0.75 bg-[#e8c84a]" />
 
@@ -93,7 +90,7 @@ export const Cart = ({ isOpen, onClose, items, onIncrement, onDecrement, onRemov
                     exit={{ opacity: 0, x: 20 }}
                     className="flex gap-4 bg-white border border-[#d4c9b0] rounded-2xl p-3 hover:border-[#1a3d2b]/30 transition-colors"
                   >
-                    <div className="relative w-16 h-16 rounded-xl overflow-hidden flex-shrink-0">
+                    <div className="relative w-16 h-16 rounded-xl overflow-hidden shrink-0">
                       <Image src={item.img} alt={item.name} fill className="object-cover" />
                     </div>
 

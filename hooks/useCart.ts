@@ -12,6 +12,7 @@ export interface Produce {
   location: string;
   rating:   number;
   img:      string;
+  farmerId: string;
 }
 
 export interface CartItem extends Produce {
@@ -25,7 +26,6 @@ export function useCart() {
   const [isOpen, setIsOpen] = useState(false);
   const [isInitialized, setIsInitialized] = useState(false);
 
-  // Load cart from localStorage on mount
   useEffect(() => {
     try {
       const stored = localStorage.getItem(CART_STORAGE_KEY);
@@ -38,7 +38,6 @@ export function useCart() {
     setIsInitialized(true);
   }, []);
 
-  // Save cart to localStorage
   useEffect(() => {
     if (isInitialized) {
       localStorage.setItem(CART_STORAGE_KEY, JSON.stringify(items));

@@ -31,7 +31,7 @@ function GrocerCard({ grocer }: { grocer: Grocer }) {
   const [isHovered, setIsHovered] = useState(false);
   const [isFollowingAnimating, setIsFollowingAnimating] = useState(false);
 
-  const userId = grocer.userId || grocer.userID;
+  const userId = grocer.userId ;
   const avatar = userId?.avatar || '';
   const fullName = userId?.fullName || '';
   const userName = userId?.userName || '';
@@ -239,7 +239,7 @@ export default function GrocersPage() {
   }, []);
 
   const filtered = grocers.filter((g) => {
-    const userId = g.userId || g.userID;
+    const userId = g.userId ;
     const shopName = g.shopName?.toLowerCase() || '';
     const location = g.location?.address?.toLowerCase() || '';
     const userName = userId?.userName?.toLowerCase() || '';

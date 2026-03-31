@@ -4,11 +4,11 @@ import cloudinary from './cloudinary';
 const storage = new CloudinaryStorage({
   cloudinary: cloudinary,
   params: {
-    folder: 'buyer-profile',       
-    allowed_formats: ['jpeg', 'png', 'jpg', 'webp'],
-    resource_type: 'auto',
-    transformation: [{ width: 500, height: 500, crop: 'limit' }], 
-  },
+  folder: 'buyer-profile',
+  allowed_formats: ['jpeg', 'png', 'jpg', 'webp'],
+  resource_type: 'auto',
+  transformation: [{ width: 500, height: 500, crop: 'limit' }],
+} as any,
 });
 
 const upload = multer({ 

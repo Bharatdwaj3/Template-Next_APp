@@ -1,18 +1,16 @@
 import mongoose from 'mongoose';
-
-
 import { MONGODB_URI } from '@/config/env';
 
 if (!MONGODB_URI) {
   throw new Error('Please define MONGODB_URI in .env.local or .env');
 }
 
-
-let cached = global.mongoose;
-
-if (!cached) {
-  cached = global.mongoose = { conn: null, promise: null };
+declare global {
+  var mongoose: { conn: mongoose.Connection | null; promise: Promise<mongoose.Connection> | null } | undefined;
 }
+
+const cached = global.mongoose ?? { conn: null, promise: null };
+global.mongoose = cached;
 
 export async function connectDB() {
   if (cached.conn) {
@@ -25,9 +23,9 @@ export async function connectDB() {
       serverSelectionTimeoutMS: 30000,
     };
 
-    cached.promise = mongoose.connect(MONGODB_URI, opts).then((mongoose) => {
+    cached.promise = mongoose.connect(MONGODB_URI!, opts).then((m) => {
       console.log('MongoDB connected');
-      return mongoose;
+      return m.connection;
     });
   }
 

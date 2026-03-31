@@ -190,7 +190,7 @@ export default function CheckoutPage() {
               {items.map((item) => (
                 <div key={item.id} className="flex gap-3 text-sm">
                   {item.img && (
-                    <div className="w-10 h-10 rounded-lg overflow-hidden relative flex-shrink-0">
+                    <div className="w-10 h-10 rounded-lg overflow-hidden relative shrink-0">
                       <Image src={item.img} alt={item.name} fill className="object-cover" />
                     </div>
                   )}

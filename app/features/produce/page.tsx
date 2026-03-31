@@ -3,12 +3,13 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { ProduceGrid, type Produce } from '@/components/ProduceGrid';
+import { ProduceGrid } from '@/components/ProduceGrid';
+import { type Produce } from '@/components/ProduceCard';
 import { useCartContext } from '@/hooks/useCartContext';
 import { Loader2 } from 'lucide-react';
 
 export default function ProducePage() {
-  const { addItem } = useCartContext();
+  const { addToCart } = useCartContext();
   const [produce, setProduce] = useState<Produce[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -31,7 +32,7 @@ export default function ProducePage() {
   }, []);
 
   const handleAddToCart = (item: any) => {
-    addItem(item);
+    addToCart(item);
   };
 
   if (loading) {

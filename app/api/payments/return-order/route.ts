@@ -71,8 +71,8 @@ export async function POST(req: NextRequest) {
       returnAmount = order.totalAmount;
       returnedItems = order.items;
     } else if (returnType === 'partial' && items?.length) {
-      returnedItems = order.items.filter(item => items.includes(item._id));
-      returnAmount = returnedItems.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+      returnedItems = order.items.filter((item: any) => items.includes(item._id));
+      returnAmount = returnedItems.reduce((sum: number, item: any) => sum + (item.price * item.quantity), 0);
     } else {
       return NextResponse.json(
         { success: false, message: 'Invalid return request' },

@@ -32,7 +32,7 @@ interface ProduceItem {
 export default function ProduceDetailPage() {
   const params = useParams();
   const router = useRouter();
-  const { addItem } = useCartContext();
+  const { addToCart } = useCartContext();
   const [produce, setProduce] = useState<ProduceItem | null>(null);
   const [loading, setLoading] = useState(true);
   const [quantity, setQuantity] = useState(1);
@@ -65,16 +65,17 @@ export default function ProduceDetailPage() {
   const handleAddToCart = () => {
     if (!produce) return;
     setAddingToCart(true);
-    addItem({
-      id: produce._id,
-      name: produce.name,
-      price: produce.price,
-      quantity: quantity,
-      unit: produce.unit,
-      image: produce.img,
-      farmerId: produce.farmerId._id,
-      farmerName: produce.farmerId.fullName
-    });
+   addToCart({
+     id: produce._id,
+     name: produce.name,
+     price: produce.price,
+     unit: produce.unit,
+     img: produce.img,
+     grower: produce.farmerId.fullName,
+     farmerId: produce.farmerId._id,
+     location: '',
+     rating: 0
+   });
     setTimeout(() => setAddingToCart(false), 500);
   };
 

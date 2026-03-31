@@ -4,7 +4,7 @@ import { ProduceCard, type Produce } from './ProduceCard';
 
 interface ProduceGridProps {
   produce: Produce[];
-  onAddToCart: (item: any) => void;
+  onAddToCart: (item: unknown) => void;
 }
 
 export const ProduceGrid = ({ produce, onAddToCart }: ProduceGridProps) => {

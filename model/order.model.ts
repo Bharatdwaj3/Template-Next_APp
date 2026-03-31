@@ -1,10 +1,11 @@
 // model/order.model.ts
-import { Schema, model, models } from 'mongoose';
+
+import mongoose, { Schema, model, models } from 'mongoose';
 
 export interface IOrder {
   orderId: string;
   paymentId?: string;
-  userId: string;
+  userId: mongoose.Types.ObjectId;
   customerInfo: {
     name: string;
     email: string;

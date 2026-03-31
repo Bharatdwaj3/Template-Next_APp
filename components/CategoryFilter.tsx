@@ -4,7 +4,7 @@ import {motion} from 'framer-motion';
 import { useCategoryFilter } from '@/hooks/useCategoryFilter';
 
 export default function CategoryFilter(){
-  const {selectedCategory, handleCategoryClick, CATEGORIES}=
+  const {selectedCategory, handleCategoryClick, PRODUCE_CATEGORIES: CATEGORIES}=
   useCategoryFilter();
 
   return(

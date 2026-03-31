@@ -19,7 +19,7 @@ export default function Explore() {
 
       <CategoryFilter />
       <div className="max-w-7xl mx-auto px-6 py-10">
-        <ProduceGrid onAddToCart={addToCart} produce={[]} />
+        <ProduceGrid onAddToCart={(item: any) => addToCart(item)} produce={[]} />
       </div>
     </Page>
   );

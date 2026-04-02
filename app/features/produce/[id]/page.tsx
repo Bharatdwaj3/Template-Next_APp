@@ -4,8 +4,9 @@ import { useEffect, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import Image from 'next/image';
 import Link from 'next/link';
-import { ArrowLeft, Package, Loader2, ShoppingBasket, Leaf, Star } from 'lucide-react';
+import { ArrowLeft, Package, Loader2, ShoppingBasket, Leaf, Star, Heart } from 'lucide-react';
 import { useCartContext } from '@/hooks/useCartContext';
+import { useSavedProduce } from '@/hooks/useSavedProduce';
 import { api } from '@/lib/api';
 
 interface ProduceItem {
@@ -37,6 +38,9 @@ export default function ProduceDetailPage() {
   const [loading, setLoading] = useState(true);
   const [quantity, setQuantity] = useState(1);
   const [addingToCart, setAddingToCart] = useState(false);
+
+  // Save produce functionality
+  const { isSaved, toggle: toggleSave } = useSavedProduce(params.id as string);
 
   useEffect(() => {
     const fetchProduce = async () => {
@@ -77,7 +81,7 @@ export default function ProduceDetailPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
+      <div className="min-h-screen flex items-center justify-center bg-bg">
         <Loader2 className="animate-spin text-primary" size={40} />
       </div>
     );
@@ -85,7 +89,7 @@ export default function ProduceDetailPage() {
 
   if (!produce) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
+      <div className="min-h-screen flex items-center justify-center bg-bg">
         <div className="text-center">
           <p className="text-text-muted mb-4">Produce not found.</p>
           <Link href="/features/produce" className="flex items-center justify-center gap-2 text-primary hover:underline">
@@ -132,27 +136,41 @@ export default function ProduceDetailPage() {
             {/* Details Section */}
             <div>
               <div className="mb-4">
-                <p className="text-[10px] font-black uppercase tracking-widest text-cta mb-1">
-                  {produce.category}
-                </p>
+                <div className="flex items-center justify-between mb-1">
+                  <p className="text-[10px] font-black uppercase tracking-widest text-cta">
+                    {produce.category}
+                  </p>
+                  {/* Save Button */}
+                  <button
+                    onClick={toggleSave}
+                    className={`flex items-center gap-2 px-3 py-1.5 rounded-full text-[10px] font-black uppercase tracking-wider transition-all ${
+                      isSaved
+                        ? 'bg-red-100 text-red-600 border border-red-200'
+                        : 'bg-bg text-text-muted border border-border hover:border-border-hover'
+                    }`}
+                  >
+                    <Heart size={12} className={isSaved ? 'fill-current' : ''} />
+                    {isSaved ? 'Saved' : 'Save'}
+                  </button>
+                </div>
                 <h1 className="text-3xl font-black text-primary uppercase tracking-tight mb-2">
                   {produce.name}
                 </h1>
                 <div className="flex items-center gap-4 mb-4">
                   <div className="flex items-center gap-1">
-                    <Star size={14} className="fill-cta text-cta" />
-                    <span className="text-sm font-bold text-cta">{produce.rating || 0}</span>
+                    <Star size={14} className="fill-accent text-accent" />
+                    <span className="text-sm font-bold text-accent">{produce.rating || 0}</span>
                     <span className="text-[10px] text-text-muted">({produce.totalReviews || 0} reviews)</span>
                   </div>
                   <Link
                     href={`/features/farmer/${produce.farmerId._id}`}
                     className="flex items-center gap-2 text-[11px] text-text-muted hover:text-primary transition-colors"
                   >
-                    <div className="w-5 h-5 rounded-full bg-primary/10 flex items-center justify-center">
+                    <div className="w-5 h-5 rounded-full bg-primary/10 flex items-center justify-center overflow-hidden">
                       {produce.farmerId.avatar ? (
-                        <Image src={produce.farmerId.avatar} alt={produce.farmerId.fullName} width={20} height={20} className="rounded-full" />
+                        <Image src={produce.farmerId.avatar} alt={produce.farmerId.fullName} width={20} height={20} className="rounded-full object-cover" />
                       ) : (
-                        <span className="text-[8px] font-black">{produce.farmerId.fullName?.[0]}</span>
+                        <span className="text-[8px] font-black text-primary">{produce.farmerId.fullName?.[0]}</span>
                       )}
                     </div>
                     by {produce.farmerId.fullName}
@@ -172,17 +190,17 @@ export default function ProduceDetailPage() {
                 </div>
 
                 <div className="flex items-center gap-4 mb-6">
-                  <div className="flex items-center border border-border rounded-xl">
+                  <div className="flex items-center border border-border rounded-xl bg-bg-alt">
                     <button
                       onClick={() => setQuantity(Math.max(1, quantity - 1))}
-                      className="px-3 py-2 text-primary hover:bg-bg transition-colors"
+                      className="px-3 py-2 text-primary hover:bg-bg transition-colors font-bold"
                     >
                       -
                     </button>
                     <span className="w-12 text-center text-sm font-bold text-primary">{quantity}</span>
                     <button
                       onClick={() => setQuantity(Math.min(produce.stock, quantity + 1))}
-                      className="px-3 py-2 text-primary hover:bg-bg transition-colors"
+                      className="px-3 py-2 text-primary hover:bg-bg transition-colors font-bold"
                     >
                       +
                     </button>
@@ -204,9 +222,9 @@ export default function ProduceDetailPage() {
                 <div className="flex items-center justify-between text-[11px]">
                   <span className={`px-3 py-1 rounded-full font-black uppercase tracking-wider ${
                     produce.stock > 10 
-                      ? 'bg-green-100 text-green-700' 
+                      ? 'bg-primary/10 text-primary' 
                       : produce.stock > 0 
-                        ? 'bg-orange-100 text-orange-700'
+                        ? 'bg-cta/10 text-cta'
                         : 'bg-red-100 text-red-700'
                   }`}>
                     {produce.stock > 10 

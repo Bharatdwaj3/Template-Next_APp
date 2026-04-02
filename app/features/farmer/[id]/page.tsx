@@ -67,8 +67,14 @@ export default function FarmerProfilePage({ params }: { params: Promise<{ id: st
   const [activeTab, setActiveTab] = useState(0);
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [produceloading, setProduceLoading] = useState(false);
-  const { isFollowing, toggle } = useFollow('farmer', id);
+
+  const { isFollowing, toggle } = useFollow(id);
   const isOwner = currentUser?.id === id;
+  const localFollowing = useAppSelector((state) => state.follow.following);  // ✅ ADD THIS
+
+// Calculate display counts
+const displayFollowerCount = isOwner ? localFollowing.length : (farmer?.followers?.length ?? 0);
+const displayFollowingCount = isOwner ? localFollowing.length : (farmer?.following?.length ?? 0);
 
   useEffect(() => {
     const loadFarmer = async () => {
@@ -197,6 +203,8 @@ export default function FarmerProfilePage({ params }: { params: Promise<{ id: st
   const location = farmer.location?.address || '';
   const isOrganic = farmer.farmType?.includes('organic') || farmer.farmType?.includes('natural');
 
+  
+
   return (
     <ProtectedRoute>
       <div className="bg-[#f5f0e8] min-h-screen pb-20">
@@ -276,18 +284,21 @@ export default function FarmerProfilePage({ params }: { params: Promise<{ id: st
           </div>
 
           {/* Stats */}
-          <div className="grid grid-cols-3 gap-4 mb-10">
-            {[
-              { label: 'Followers', val: farmer.followers?.length ?? 0 },
-              { label: 'Following', val: farmer.following?.length ?? 0 },
-              { label: 'Products', val: farmer.produce?.length ?? 0 },
-            ].map(({ label, val }) => (
-              <div key={label} className="bg-white border border-[#d4c9b0] rounded-2xl px-6 py-5 text-center">
-                <p className="text-3xl font-black text-[#1a3d2b]">{val}</p>
-                <p className="text-[9px] font-black uppercase tracking-[0.4em] text-[#8a9a8e] mt-1">{label}</p>
-              </div>
-            ))}
-          </div>
+         {/* Stats */}
+<div className="grid grid-cols-3 gap-4 mb-10">
+  <div className="bg-white border border-[#d4c9b0] rounded-2xl px-6 py-5 text-center">
+    <p className="text-3xl font-black text-[#1a3d2b]">{displayFollowerCount}</p>
+    <p className="text-[9px] font-black uppercase tracking-[0.4em] text-[#8a9a8e] mt-1">FOLLOWERS</p>
+  </div>
+  <div className="bg-white border border-[#d4c9b0] rounded-2xl px-6 py-5 text-center">
+    <p className="text-3xl font-black text-[#1a3d2b]">{displayFollowingCount}</p>
+    <p className="text-[9px] font-black uppercase tracking-[0.4em] text-[#8a9a8e] mt-1">FOLLOWING</p>
+  </div>
+  <div className="bg-white border border-[#d4c9b0] rounded-2xl px-6 py-5 text-center">
+    <p className="text-3xl font-black text-[#1a3d2b]">{farmer.produce?.length ?? 0}</p>
+    <p className="text-[9px] font-black uppercase tracking-[0.4em] text-[#8a9a8e] mt-1">PRODUCTS</p>
+  </div>
+</div>
 
           {/* Bio + Specialties */}
           <div className="grid grid-cols-12 gap-8 mb-12">

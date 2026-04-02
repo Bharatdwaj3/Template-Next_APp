@@ -1,4 +1,5 @@
 // store/followSlice.ts
+
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 
 function fromStorage<T>(key: string, fallback: T): T {
@@ -29,12 +30,12 @@ const followSlice = createSlice({
   initialState,
   reducers: {
     toggleFollow: (state, action: PayloadAction<string>) => {
-      const key = action.payload;
-      const index = state.following.indexOf(key);
+      const userId = action.payload;
+      const index = state.following.indexOf(userId);
       if (index > -1) {
         state.following.splice(index, 1);
       } else {
-        state.following.push(key);
+        state.following.push(userId);
       }
       toStorage('nerthus_following', state.following);
     },

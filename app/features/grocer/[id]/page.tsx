@@ -45,8 +45,15 @@ export default function GrocerProfilePage({ params }: { params: Promise<{ id: st
   const [grocer, setGrocer] = useState<GrocerProfile | null>(null);
   const [loading, setLoading] = useState(true);
   const [loggingOut, setLoggingOut] = useState(false);
-  const { isFollowing, toggle } = useFollow('grocer', id);
+  const { isFollowing, toggle } = useFollow(id);
   const isOwner = currentUser?.id === id;
+
+  const localFollowing = useAppSelector((state) => state.follow.following);  // ✅ ADD THIS
+
+// Calculate display counts
+const displayFollowerCount = isOwner ? localFollowing.length : (grocer?.followers?.length ?? 0);
+const displayFollowingCount = isOwner ? localFollowing.length : (grocer?.following?.length ?? 0);
+
 
   useEffect(() => {
     const load = async () => {
@@ -189,18 +196,21 @@ export default function GrocerProfilePage({ params }: { params: Promise<{ id: st
           </div>
 
           {/* Stats */}
-          <div className="grid grid-cols-3 gap-4 mb-10">
-            {[
-              { label: 'Followers', val: followerCount },
-              { label: 'Saved Produce', val: savedCount },
-              { label: 'Liked Produce', val: likedCount },
-            ].map(({ label, val }) => (
-              <div key={label} className="bg-white border border-[#d4c9b0] rounded-2xl px-6 py-5 text-center">
-                <p className="text-3xl font-black text-[#1a3d2b]">{val}</p>
-                <p className="text-[9px] font-black uppercase tracking-[0.4em] text-[#8a9a8e] mt-1">{label}</p>
-              </div>
-            ))}
-          </div>
+         {/* Stats */}
+<div className="grid grid-cols-3 gap-4 mb-10">
+  <div className="bg-white border border-[#d4c9b0] rounded-2xl px-6 py-5 text-center">
+    <p className="text-3xl font-black text-[#1a3d2b]">{displayFollowerCount}</p>
+    <p className="text-[9px] font-black uppercase tracking-[0.4em] text-[#8a9a8e] mt-1">FOLLOWERS</p>
+  </div>
+  <div className="bg-white border border-[#d4c9b0] rounded-2xl px-6 py-5 text-center">
+    <p className="text-3xl font-black text-[#1a3d2b]">{displayFollowingCount}</p>
+    <p className="text-[9px] font-black uppercase tracking-[0.4em] text-[#8a9a8e] mt-1">FOLLOWING</p>
+  </div>
+  <div className="bg-white border border-[#d4c9b0] rounded-2xl px-6 py-5 text-center">
+    <p className="text-3xl font-black text-[#1a3d2b]">{savedCount}</p>
+    <p className="text-[9px] font-black uppercase tracking-[0.4em] text-[#8a9a8e] mt-1">SAVED</p>
+  </div>
+</div>
 
           {/* Bio */}
           <div className="mb-12">

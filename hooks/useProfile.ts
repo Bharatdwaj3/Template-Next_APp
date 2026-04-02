@@ -1,12 +1,12 @@
+// hooks/useProfile.ts
 'use client';
-
 import { useEffect, useState } from 'react';
 import { useAppSelector } from '@/store/hooks';
 import type { NerthusUser } from '@/store/avatarSlice';
+import { api } from '@/lib/api';
 
 export function useProfile() {
   const storeUser = useAppSelector((state) => state.avatar.user);
-
   const [profile, setProfile] = useState<NerthusUser | null>(null);
   const [loading, setLoading] = useState(true);
 
@@ -19,9 +19,8 @@ export function useProfile() {
       }
 
       try {
-        const res  = await fetch('/api/auth/profile');
-        const data = await res.json();
-
+        const data = await api.get('/auth/profile');
+        
         if (data.success) {
           setProfile(data.user);
         }

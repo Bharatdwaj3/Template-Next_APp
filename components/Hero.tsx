@@ -1,108 +1,91 @@
 'use client';
-
 import { motion } from 'framer-motion';
 import Link from 'next/link';
-import { Sprout, ArrowRight } from 'lucide-react';
+import Image from 'next/image';
+import { ArrowRight } from 'lucide-react';
 
 export const Hero = () => {
   return (
-    <header className="relative min-h-screen w-full flex bg-[#f5f0e8] overflow-hidden">
-
-      <div className="absolute inset-0 z-0 pointer-events-none">
-        <div className="absolute top-[-10%] right-[5%] w-[55%] h-[65%] bg-[#1a3d2b]/6 blur-[140px] rounded-full" />
-        <div className="absolute bottom-[10%] left-[15%] w-[45%] h-[55%] bg-[#e86c2a]/5 blur-[120px] rounded-full" />
+    <header className="relative min-h-[90vh] flex items-center overflow-hidden bg-primary">
+      <div className="absolute inset-0 z-0">
+        <Image
+          src="https://images.unsplash.com/photo-1500382017468-9049fed747ef?q=80&w=2000&auto=format&fit=crop" 
+          alt="Lush organic farmland"
+          fill
+          className="object-cover opacity-60"
+          priority
+        />
+        <div className="absolute inset-0 bg-linear-to-r from-primary via-primary/80 to-transparent" />
       </div>
 
-      <div className="absolute right-0 top-0 bottom-0 w-32 flex items-center justify-center overflow-hidden pointer-events-none z-0">
+      <div className="absolute right-0 top-0 bottom-0 w-32 flex items-center justify-center overflow-hidden pointer-events-none z-10">
         <span
-          className="text-[9rem] font-black text-[#1a3d2b]/4 uppercase select-none whitespace-nowrap"
-          style={{ writingMode: 'vertical-rl', letterSpacing: '-0.05em' }}
+          className="text-[12rem] font-black text-bg/5 uppercase select-none whitespace-nowrap tracking-tighter"
+          style={{ writingMode: 'vertical-rl' }}
         >
           Nerthus
         </span>
       </div>
 
-      <motion.div
-        initial={{ opacity: 0, x: -24 }}
-        animate={{ opacity: 1, x: 0 }}
-        transition={{ duration: 1.0 }}
-        className="w-full lg:w-[42%] lg:min-w-100 flex flex-col justify-center px-8 lg:px-24 z-20 bg-[#1a3d2b] relative pt-20"
-      >
-        <div className="absolute top-0 left-0 right-0 h-0.75 bg-[#e8c84a]" />
-
-        <motion.p
-          initial={{ opacity: 0, y: -8 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.4 }}
-          className="text-[10px] font-black uppercase tracking-[0.5rem] text-[#e8c84a]/70 mb-6 flex items-center gap-2"
-        >
-          <Sprout size={12} className="text-[#e8c84a]" />
-          Earth Goddess . Germanic . Anno
-        </motion.p>
-
-        <h1 className="text-7xl xl:text-8xl font-black tracking-tighter text-[#f5f0e8] mb-2 leading-none uppercase select-none">
-          Nerthus
-        </h1>
-
-        <div
-          className="w-16 h-0.5 mb-6"
-          style={{ background: 'linear-gradient(90deg, #e8c84a, transparent)' }}
-        />
-
-        <p className="text-[10px] font-bold uppercase tracking-[0.3em] text-[#e86c2a] mb-4">
-          From soil to table - unmediated
-        </p>
-
-        <p className="text-base text-[#f5f0e8]/68 leading-relaxed mb-10 font-light max-w-sm">
-          A living marketplace where growers share harvest and families find
-          nourishment. No algorithms. No middlemen. Just the
-          <span className="text-[#e8c84a] font-medium ml-1">earth&apos;s honest yield</span>.
-        </p>
-
-        <div className="flex flex-col gap-5">
-          <Link
-            href="/features/produce"
-            className="group flex items-center gap-3 w-fit bg-[#e86c2a] text-white text-[11px] font-black uppercase tracking-widest px-7 py-3.5 rounded-full hover:bg-[#d45e1e] transition-colors shadow-lg"
+      <div className="container mx-auto px-8 lg:px-24 relative z-20 grid lg:grid-cols-12 gap-12 items-center">
+        <div className="lg:col-span-7 pt-20 pb-32">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8 }}
           >
-            Discover Farmers
-            <ArrowRight size={14} className="group-hover:translate-x-1 transition-transform" />
-          </Link>
-          <Link
-            href="/features/auth/register"
-            className="group flex items-center gap-3 w-fit text-[11px] font-black uppercase tracking-widest text-[#f5f0e8]/60 hover:text-[#e8c84a] transition-colors border-b border-[#f5f0e8]/20 hover:border-[#e8c84a] pb-1"
-          >
-            Sell Your Harvest →
-          </Link>
-        </div>
+            <p className="text-[11px] font-black uppercase tracking-[0.6em] text-accent mb-6 flex items-center gap-3">
+              <span className="w-8 h-px bg-accent" />
+              Earth Goddess . Organic . Direct
+            </p>
 
-        <div className="absolute bottom-8 left-8 lg:left-24 flex gap-8">
-          {[['2,400+', 'Farmers'], ['18', 'Counties'], ['100%', 'Organic']].map(([num, label]) => (
-            <div key={label}>
-              <p className="text-xl font-black text-[#e8c84a]">{num}</p>
-              <p className="text-[9px] font-bold uppercase tracking-widest text-[#f5f0e8]/40">{label}</p>
+            <h1 className="text-7xl xl:text-[9rem] font-black tracking-tighter text-bg mb-6 leading-[0.85] uppercase">
+              Nerthus
+            </h1>
+
+            <p className="text-xs font-bold uppercase tracking-[0.4em] text-cta mb-6">
+              From soil to table — unmediated
+            </p>
+
+            <p className="text-lg text-bg/80 leading-relaxed mb-12 max-w-lg font-light">
+              A living marketplace where growers share harvest and families find
+              nourishment. No algorithms. Just the
+              <span className="text-accent font-medium ml-2">earth&apos;s honest yield</span>.
+            </p>
+
+            <div className="flex flex-wrap items-center gap-8">
+              <Link
+                href="/produce"
+                className="group flex items-center gap-4 bg-cta text-white text-[12px] font-black uppercase tracking-widest px-10 py-5 rounded-full hover:scale-105 transition-all shadow-2xl shadow-cta/20"
+              >
+                Discover Farmers
+                <ArrowRight size={16} className="group-hover:translate-x-1 transition-transform" />
+              </Link>
             </div>
-          ))}
+          </motion.div>
         </div>
-      </motion.div>
 
-      <div className="hidden lg:flex flex-1 relative items-center justify-center">
-        <motion.div
-          initial={{ scaleX: 0, opacity: 0 }}
-          animate={{ scaleX: 1, opacity: 0.12 }}
-          transition={{ duration: 2, delay: 0.6 }}
-          className="absolute w-full h-px"
-          style={{ background: 'linear-gradient(to right, transparent, #1a3d2b, transparent)' }}
-        />
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.8, duration: 0.6 }}
-          className="absolute bottom-24 right-24 bg-white/80 backdrop-blur-sm border border-[#d4c9b0] rounded-2xl px-6 py-4 shadow-xl"
-        >
-          <p className="text-[9px] font-black uppercase tracking-[0.4em] text-[#8a9a8e] mb-1">Now in Season</p>
-          <p className="text-lg font-black text-[#1a3d2b] uppercase tracking-tight">Spring Harvest</p>
-        </motion.div>
-        <div className="w-[40%] h-[40%] bg-[#e86c2a]/5 blur-[100px] rounded-full pointer-events-none" />
+        <div className="lg:col-span-5 hidden lg:flex justify-end">
+          <motion.div
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ delay: 0.5, duration: 1 }}
+            className="bg-bg/10 backdrop-blur-md border border-white/10 rounded-[2.5rem] p-10 max-w-sm relative"
+          >
+            <div className="absolute -top-6 -right-6 bg-accent text-primary w-24 h-24 rounded-full flex items-center justify-center font-black text-center leading-tight text-[10px] uppercase tracking-tighter rotate-12 shadow-xl">
+              100%<br/>Organic
+            </div>
+            <p className="text-[10px] font-black uppercase tracking-[0.4em] text-accent/80 mb-2">
+              Season Highlight
+            </p>
+            <h3 className="text-3xl font-black text-bg uppercase tracking-tight mb-4">
+              Spring Harvest
+            </h3>
+            <p className="text-sm text-bg/60 leading-relaxed">
+              Early greens and heirloom radishes are now reaching peak flavor across our network.
+            </p>
+          </motion.div>
+        </div>
       </div>
     </header>
   );

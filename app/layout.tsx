@@ -15,7 +15,7 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="en" className={`${geistSans.variable} ${geistMono.variable}`}>
-      <body className="min-h-screen bg-[#f5f0e8] font-sans antialiased">
+      <body className="min-h-screen bg-[var(--color-bg)] font-sans antialiased">
         <ClientWrapper>
           <main>{children}</main>
         </ClientWrapper>

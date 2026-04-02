@@ -1,5 +1,4 @@
 'use client';
-
 import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { MapPin, CreditCard, Truck, CheckCircle } from 'lucide-react';
@@ -25,161 +24,156 @@ export const CheckoutForm = ({ items }: CheckoutFormProps) => {
     setForm((prev) => ({ ...prev, [field]: value }));
 
   const inputClass =
-    'w-full bg-white border border-[#d4c9b0] rounded-xl px-4 py-3 text-sm text-[#1a3d2b] placeholder:text-[#a09880] focus:outline-none focus:border-[#1a3d2b] transition-colors';
+    'w-full bg-bg-alt border border-border rounded-xl px-4 py-3 text-sm text-primary placeholder:text-text-placeholder focus:outline-none focus:border-primary transition-colors';
 
   return (
-    <div className="bg-[#f5f0e8] min-h-screen py-16 px-6">
-      <div className="max-w-4xl mx-auto">
+    <div className="max-w-6xl mx-auto px-6 py-10">
+      <div className="mb-10">
+        <p className="text-[10px] font-black uppercase tracking-[0.5em] text-cta mb-2">Almost there</p>
+        <h1 className="text-4xl font-black text-primary uppercase tracking-tight">Checkout</h1>
+        <div className="w-12 h-[2px] mt-3" style={{ background: 'linear-gradient(90deg, var(--color-accent), transparent)' }} />
+      </div>
 
-        <div className="mb-10">
-          <p className="text-[10px] font-black uppercase tracking-[0.5em] text-[#e86c2a] mb-2">Almost there</p>
-          <h1 className="text-4xl font-black text-[#1a3d2b] uppercase tracking-tight">Checkout</h1>
-          <div className="w-12 h-[2px] mt-3" style={{ background: 'linear-gradient(90deg, #e8c84a, transparent)' }} />
-        </div>
-
-        <div className="flex items-center gap-0 mb-12">
-          {STEPS.map((s, i) => (
-            <div key={s} className="flex items-center">
-              <button
-                onClick={() => i < step && setStep(i)}
-                className={`flex items-center gap-2 px-4 py-2 rounded-full text-[10px] font-black uppercase tracking-widest transition-all ${
-                  i === step
-                    ? 'bg-[#1a3d2b] text-[#e8c84a]'
-                    : i < step
-                    ? 'bg-[#e8c84a]/30 text-[#1a3d2b] cursor-pointer'
-                    : 'bg-white border border-[#d4c9b0] text-[#8a9a8e]'
-                }`}
-              >
-                {i < step ? <CheckCircle size={12} /> : null}
-                {s}
-              </button>
-              {i < STEPS.length - 1 && (
-                <div className={`h-px w-8 mx-1 ${i < step ? 'bg-[#1a3d2b]' : 'bg-[#d4c9b0]'}`} />
-              )}
-            </div>
-          ))}
-        </div>
-
-        <div className="grid grid-cols-12 gap-8">
-
-          <div className="col-span-7">
-            <motion.div
-              key={step}
-              initial={{ opacity: 0, x: 16 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.2 }}
+      <div className="flex items-center gap-0 mb-12">
+        {STEPS.map((s, i) => (
+          <div key={s} className="flex items-center">
+            <button
+              onClick={() => i < step && setStep(i)}
+              className={`flex items-center gap-2 px-4 py-2 rounded-full text-[10px] font-black uppercase tracking-widest transition-all ${
+                i === step
+                  ? 'bg-primary text-accent'
+                  : i < step
+                  ? 'bg-accent/30 text-primary cursor-pointer'
+                  : 'bg-bg-alt border border-border text-text-muted'
+              }`}
             >
-
-              {step === 0 && (
-                <div className="space-y-4">
-                  <div className="flex items-center gap-2 mb-6">
-                    <MapPin className="w-5 h-5 text-[#e86c2a]" />
-                    <h2 className="text-lg font-black text-[#1a3d2b] uppercase tracking-tight">
-                      Delivery Address
-                    </h2>
-                  </div>
-                  <div className="grid grid-cols-2 gap-4">
-                    <input placeholder="Full name" value={form.name} onChange={(e) => update('name', e.target.value)} className={inputClass} />
-                    <input placeholder="Phone number" value={form.phone} onChange={(e) => update('phone', e.target.value)} className={inputClass} />
-                  </div>
-                  <input placeholder="Street address" value={form.address} onChange={(e) => update('address', e.target.value)} className={inputClass} />
-                  <div className="grid grid-cols-2 gap-4">
-                    <input placeholder="City" value={form.city} onChange={(e) => update('city', e.target.value)} className={inputClass} />
-                    <input placeholder="Pincode" value={form.pincode} onChange={(e) => update('pincode', e.target.value)} className={inputClass} />
-                  </div>
-
-                  <div className="flex items-center gap-3 bg-[#1a3d2b]/5 rounded-xl p-4 border border-[#1a3d2b]/10">
-                    <Truck size={16} className="text-[#1a3d2b] shrink-0" />
-                    <p className="text-[11px] text-[#4a5a4e] leading-relaxed">
-                      Delivery within <span className="font-black text-[#1a3d2b]">2–4 hours</span> for orders placed before 12pm. Fresh, direct from the farm.
-                    </p>
-                  </div>
-                </div>
-              )}
-
-              {step === 1 && (
-                <div className="space-y-4">
-                  <div className="flex items-center gap-2 mb-6">
-                    <CreditCard className="w-5 h-5 text-[#e86c2a]" />
-                    <h2 className="text-lg font-black text-[#1a3d2b] uppercase tracking-tight">Payment</h2>
-                  </div>
-                  <input placeholder="Card number" value={form.cardNumber} onChange={(e) => update('cardNumber', e.target.value)} className={inputClass} />
-                  <div className="grid grid-cols-2 gap-4">
-                    <input placeholder="MM / YY" value={form.expiry} onChange={(e) => update('expiry', e.target.value)} className={inputClass} />
-                    <input placeholder="CVV" value={form.cvv} onChange={(e) => update('cvv', e.target.value)} className={inputClass} />
-                  </div>
-                  <div className="flex items-center gap-3 bg-[#1a3d2b]/5 rounded-xl p-4 border border-[#1a3d2b]/10">
-                    <CheckCircle size={16} className="text-[#1a3d2b] flex-shrink-0" />
-                    <p className="text-[11px] text-[#4a5a4e]">
-                      Your payment is secured with 256-bit SSL encryption.
-                    </p>
-                  </div>
-                </div>
-              )}
-
-              {step === 2 && (
-                <div className="space-y-6">
-                  <h2 className="text-lg font-black text-[#1a3d2b] uppercase tracking-tight mb-4">
-                    Review Order
-                  </h2>
-                  {items.map((item) => (
-                    <div key={item.id} className="flex items-center justify-between py-3 border-b border-[#d4c9b0]">
-                      <div>
-                        <p className="text-[12px] font-black text-[#1a3d2b] uppercase">{item.name}</p>
-                        <p className="text-[10px] text-[#8a9a8e]">x{item.quantity} · {item.grower}</p>
-                      </div>
-                      <p className="text-[13px] font-black text-[#1a3d2b]">₹{(item.price * item.quantity).toFixed(0)}</p>
-                    </div>
-                  ))}
-                </div>
-              )}
-            </motion.div>
-
-            <div className="flex items-center justify-between mt-8">
-              {step > 0 && (
-                <button
-                  onClick={() => setStep(step - 1)}
-                  className="text-[11px] font-black uppercase tracking-widest text-[#4a5a4e] hover:text-[#1a3d2b] transition-colors"
-                >
-                  ← Back
-                </button>
-              )}
-              <button
-                onClick={() => step < 2 ? setStep(step + 1) : alert('Order placed!')}
-                className="ml-auto flex items-center gap-2 bg-[#1a3d2b] text-[#e8c84a] text-[11px] font-black uppercase tracking-widest px-8 py-3.5 rounded-xl hover:bg-[#1a3d2b]/90 transition-colors"
-              >
-                {step === 2 ? 'Place Order 🌿' : 'Continue →'}
-              </button>
-            </div>
+              {i < step ? <CheckCircle size={12} /> : null}
+              {s}
+            </button>
+            {i < STEPS.length - 1 && (
+              <div className={`h-px w-8 mx-1 ${i < step ? 'bg-primary' : 'bg-border'}`} />
+            )}
           </div>
+        ))}
+      </div>
 
-          <div className="col-span-5">
-            <div className="bg-white border border-[#d4c9b0] rounded-2xl overflow-hidden sticky top-24">
-              <div className="bg-[#1a3d2b] px-5 py-4">
-                <div className="absolute top-0 left-0 right-0 h-[2px] bg-[#e8c84a]" />
-                <p className="text-[10px] font-black uppercase tracking-[0.4em] text-[#e8c84a]/60">Summary</p>
-                <p className="text-lg font-black text-white uppercase tracking-tight">Order Details</p>
+      <div className="grid grid-cols-12 gap-8">
+        <div className="col-span-7">
+          <motion.div
+            key={step}
+            initial={{ opacity: 0, x: 16 }}
+            animate={{ opacity: 1, x: 0 }}
+            transition={{ duration: 0.2 }}
+          >
+            {step === 0 && (
+              <div className="space-y-4">
+                <div className="flex items-center gap-2 mb-6">
+                  <MapPin className="w-5 h-5 text-cta" />
+                  <h2 className="text-lg font-black text-primary uppercase tracking-tight">
+                    Delivery Address
+                  </h2>
+                </div>
+                <div className="grid grid-cols-2 gap-4">
+                  <input placeholder="Full name" value={form.name} onChange={(e) => update('name', e.target.value)} className={inputClass} />
+                  <input placeholder="Phone number" value={form.phone} onChange={(e) => update('phone', e.target.value)} className={inputClass} />
+                </div>
+                <input placeholder="Street address" value={form.address} onChange={(e) => update('address', e.target.value)} className={inputClass} />
+                <div className="grid grid-cols-2 gap-4">
+                  <input placeholder="City" value={form.city} onChange={(e) => update('city', e.target.value)} className={inputClass} />
+                  <input placeholder="Pincode" value={form.pincode} onChange={(e) => update('pincode', e.target.value)} className={inputClass} />
+                </div>
+
+                <div className="flex items-center gap-3 bg-primary/5 rounded-xl p-4 border border-primary/10">
+                  <Truck size={16} className="text-primary shrink-0" />
+                  <p className="text-[11px] text-text-green leading-relaxed">
+                    Delivery within <span className="font-black text-primary">2–4 hours</span> for orders placed before 12pm. Fresh, direct from the farm.
+                  </p>
+                </div>
               </div>
-              <div className="p-5 space-y-3">
+            )}
+
+            {step === 1 && (
+              <div className="space-y-4">
+                <div className="flex items-center gap-2 mb-6">
+                  <CreditCard className="w-5 h-5 text-cta" />
+                  <h2 className="text-lg font-black text-primary uppercase tracking-tight">Payment</h2>
+                </div>
+                <input placeholder="Card number" value={form.cardNumber} onChange={(e) => update('cardNumber', e.target.value)} className={inputClass} />
+                <div className="grid grid-cols-2 gap-4">
+                  <input placeholder="MM/YY" value={form.expiry} onChange={(e) => update('expiry', e.target.value)} className={inputClass} />
+                  <input placeholder="CVV" value={form.cvv} onChange={(e) => update('cvv', e.target.value)} className={inputClass} />
+                </div>
+                <div className="flex items-center gap-3 bg-primary/5 rounded-xl p-4 border border-primary/10">
+                  <CheckCircle size={16} className="text-primary flex-shrink-0" />
+                  <p className="text-[11px] text-text-green">
+                    Your payment is secured with 256-bit SSL encryption.
+                  </p>
+                </div>
+              </div>
+            )}
+
+            {step === 2 && (
+              <div className="space-y-6">
+                <h2 className="text-lg font-black text-primary uppercase tracking-tight mb-4">
+                  Review Order
+                </h2>
                 {items.map((item) => (
-                  <div key={item.id} className="flex justify-between text-[11px]">
-                    <span className="text-[#4a5a4e] font-bold">{item.name} × {item.quantity}</span>
-                    <span className="font-black text-[#1a3d2b]">₹{(item.price * item.quantity).toFixed(0)}</span>
+                  <div key={item.id} className="flex items-center justify-between py-3 border-b border-border">
+                    <div>
+                      <p className="text-[12px] font-black text-primary uppercase">{item.name}</p>
+                      <p className="text-[10px] text-text-muted">x{item.quantity} · {item.grower}</p>
+                    </div>
+                    <p className="text-[13px] font-black text-primary">₹{(item.price * item.quantity).toFixed(0)}</p>
                   </div>
                 ))}
-                <div className="border-t border-[#d4c9b0] pt-3 space-y-2">
-                  <div className="flex justify-between text-[11px]">
-                    <span className="text-[#8a9a8e]">Subtotal</span>
-                    <span className="font-black text-[#1a3d2b]">₹{total.toFixed(0)}</span>
-                  </div>
-                  <div className="flex justify-between text-[11px]">
-                    <span className="text-[#8a9a8e]">Delivery</span>
-                    <span className="font-black text-[#1a3d2b]">₹{delivery}</span>
-                  </div>
-                  <div className="flex justify-between border-t border-[#d4c9b0] pt-2">
-                    <span className="text-[12px] font-black uppercase tracking-widest text-[#1a3d2b]">Total</span>
-                    <span className="text-xl font-black text-[#1a3d2b]">₹{(total + delivery).toFixed(0)}</span>
-                  </div>
+              </div>
+            )}
+          </motion.div>
+
+          <div className="flex items-center justify-between mt-8">
+            {step > 0 && (
+              <button
+                onClick={() => setStep(step - 1)}
+                className="text-[11px] font-black uppercase tracking-widest text-text-green hover:text-primary transition-colors"
+              >
+                ← Back
+              </button>
+            )}
+            <button
+              onClick={() => step < 2 ? setStep(step + 1) : alert('Order placed!')}
+              className="ml-auto flex items-center gap-2 bg-primary text-accent text-[11px] font-black uppercase tracking-widest px-8 py-3.5 rounded-xl hover:bg-primary/90 transition-colors"
+            >
+              {step === 2 ? 'Place Order 🌿' : 'Continue →'}
+            </button>
+          </div>
+        </div>
+
+        <div className="col-span-5">
+          <div className="bg-bg-alt border border-border rounded-2xl overflow-hidden sticky top-24">
+            <div className="bg-primary px-5 py-4">
+              <div className="absolute top-0 left-0 right-0 h-[2px] bg-accent" />
+              <p className="text-[10px] font-black uppercase tracking-[0.4em] text-accent/60">Summary</p>
+              <p className="text-lg font-black text-text-inverse uppercase tracking-tight">Order Details</p>
+            </div>
+            <div className="p-5 space-y-3">
+              {items.map((item) => (
+                <div key={item.id} className="flex justify-between text-[11px]">
+                  <span className="text-text-green font-bold">{item.name} × {item.quantity}</span>
+                  <span className="font-black text-primary">₹{(item.price * item.quantity).toFixed(0)}</span>
+                </div>
+              ))}
+              <div className="border-t border-border pt-3 space-y-2">
+                <div className="flex justify-between text-[11px]">
+                  <span className="text-text-muted">Subtotal</span>
+                  <span className="font-black text-primary">₹{total.toFixed(0)}</span>
+                </div>
+                <div className="flex justify-between text-[11px]">
+                  <span className="text-text-muted">Delivery</span>
+                  <span className="font-black text-primary">₹{delivery}</span>
+                </div>
+                <div className="flex justify-between border-t border-border pt-2">
+                  <span className="text-[12px] font-black uppercase tracking-widest text-primary">Total</span>
+                  <span className="text-xl font-black text-primary">₹{(total + delivery).toFixed(0)}</span>
                 </div>
               </div>
             </div>

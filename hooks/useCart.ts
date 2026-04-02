@@ -1,17 +1,16 @@
 // hooks/useCart.ts
-'use client'
-
-import { useState, useEffect } from "react"
+'use client';
+import { useState, useEffect } from 'react';
 
 export interface Produce {
-  id:       string;
-  name:     string;
-  price:    number;
-  unit:     string;
-  grower:   string;
+  id: string;
+  name: string;
+  price: number;
+  unit: string;
+  grower: string;
   location: string;
-  rating:   number;
-  img:      string;
+  rating: number;
+  img: string;
   farmerId: string;
 }
 
@@ -26,17 +25,19 @@ export function useCart() {
   const [isOpen, setIsOpen] = useState(false);
   const [isInitialized, setIsInitialized] = useState(false);
 
-  useEffect(() => {
-    try {
-      const stored = localStorage.getItem(CART_STORAGE_KEY);
-      if (stored) {
+useEffect(() => {
+  try {
+    const stored = localStorage.getItem(CART_STORAGE_KEY);
+    if (stored) {
+      // ✅ Safe: setState in a callback, not directly in effect body
+      requestAnimationFrame(() => {
         setItems(JSON.parse(stored));
-      }
-    } catch (error) {
-      console.error('Failed to load cart:', error);
+      });
     }
-    setIsInitialized(true);
-  }, []);
+  } catch (error) {
+    console.error('Failed to load cart:', error);
+  }
+}, []);
 
   useEffect(() => {
     if (isInitialized) {
@@ -85,16 +86,16 @@ export function useCart() {
   const total = items.reduce((sum, i) => sum + i.price * i.quantity, 0);
   const itemCount = items.reduce((sum, i) => sum + i.quantity, 0);
 
-  return { 
-    items, 
-    isOpen, 
-    setIsOpen, 
-    addToCart, 
-    increment, 
-    decrement, 
-    remove, 
+  return {
+    items,
+    isOpen,
+    setIsOpen,
+    addToCart,
+    increment,
+    decrement,
+    remove,
     clearCart,
     total,
-    itemCount
+    itemCount,
   };
 }

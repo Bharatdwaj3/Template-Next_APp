@@ -1,3 +1,5 @@
+//api/auth/login/route.ts
+
 import { NextResponse } from 'next/server';
 import bcrypt from 'bcryptjs';
 import User from '@/model/user.model';
@@ -7,7 +9,6 @@ import { setAccessToken, setRefreshToken } from '@/lib/auth';
 export async function POST(request: Request) {
   try {
     await connectDB();
-
     const { email, password } = await request.json();
 
     if (!email || !password) {

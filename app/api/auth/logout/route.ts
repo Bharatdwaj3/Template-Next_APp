@@ -1,3 +1,5 @@
+//api/auth/logout/route.ts
+
 import { NextResponse } from 'next/server';
 import { clearAuthCookies, revokeRefreshToken } from '@/lib/auth';
 import { getCurrentUser } from '@/lib/auth/currentUser';

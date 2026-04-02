@@ -1,5 +1,5 @@
+// components/Testimonialsform.tsx
 'use client';
-
 import { motion } from 'framer-motion';
 import Image from 'next/image';
 import { useState } from 'react';
@@ -14,58 +14,36 @@ export const TestimonialsForm = () => {
   };
 
   return (
-    <section className="bg-[#f5f0e8] px-10 py-20 border-t border-[#d4c9b0] relative overflow-hidden">
-
-      <div className="absolute right-0 top-0 bottom-0 w-20 flex items-center justify-center overflow-hidden pointer-events-none">
-        <span
-          className="text-[8rem] font-black text-[#1a3d2b]/4 uppercase select-none whitespace-nowrap"
-          style={{ writingMode: 'vertical-rl', letterSpacing: '-0.05em' }}
-        >
-          Voices
-        </span>
-      </div>
-
-      <div className="grid grid-cols-12 gap-12 max-w-6xl mx-auto items-center relative z-10">
-
-        
+    <section className="bg-bg py-20 px-6">
+      <div className="max-w-6xl mx-auto grid grid-cols-12 gap-12 items-center">
+        {/* Left - Testimonial */}
         <motion.div
-          initial={{ x: -20, opacity: 0 }}
+          initial={{ x: -30, opacity: 0 }}
           whileInView={{ x: 0, opacity: 1 }}
-          viewport={{ once: true }}
-          className="col-span-6"
+          className="col-span-12 lg:col-span-6"
         >
-          <p className="text-[10px] font-black uppercase tracking-[0.5em] text-[#e86c2a] mb-3">
-            Our Community
-          </p>
-          <h2 className="text-4xl font-black text-[#1a3d2b] tracking-tight uppercase leading-tight mb-3">
-            Testimonially of<br />Farm Faces
-          </h2>
+          <p className="uppercase tracking-[0.5em] text-cta text-xs font-black mb-4">OUR COMMUNITY</p>
+          <h2 className="text-4xl font-black text-text-main tracking-tight mb-6">Voices of Farm Faces</h2>
 
-         
-          <div className="w-12 h-0.5 mb-6" style={{ background: 'linear-gradient(90deg, #e8c84a, transparent)' }} />
-
-          <p className="text-sm text-[#4a5a4e] leading-relaxed mb-8 max-w-sm">
-            Real farmers, real results. From small family plots to large cooperative farms — our growers
-            share what sustainable agriculture means to their lives and livelihoods.
+          <p className="text-text-green max-w-md mb-10">
+            Real farmers, real results. From small family plots to large cooperative farms.
           </p>
 
-          <blockquote className="border-l-4 border-[#1a3d2b] pl-5 mb-8 bg-[#1a3d2b]/5 py-4 pr-4 rounded-r-xl">
-            <p className="text-sm italic text-[#4a5a4e] leading-relaxed">
-              &quot;Joining this network tripled our reach. We went from local market stalls to supplying
-              three restaurants in one season.&quot;
-            </p>
-            <footer className="mt-2 text-[10px] font-black uppercase tracking-widest text-[#1a3d2b]">
+          <blockquote className="border-l-4 border-accent pl-6 italic text-lg text-text-main/90">
+            “Joining this network tripled our reach. We went from local market stalls to supplying three restaurants in one season.”
+            <footer className="mt-4 text-sm font-medium text-text-muted not-italic">
               — Rosa Mendes, Organic Grower
             </footer>
           </blockquote>
 
-          <form onSubmit={handleSubscribe} className="space-y-3">
+          {/* Newsletter Form */}
+          <form onSubmit={handleSubscribe} className="mt-12 space-y-4 max-w-md">
             <input
               type="text"
               placeholder="Your name"
               value={name}
               onChange={(e) => setName(e.target.value)}
-              className="w-full bg-white border border-[#d4c9b0] rounded-xl px-4 py-3 text-sm text-[#1a3d2b] placeholder:text-[#a09880] focus:outline-none focus:border-[#1a3d2b] transition-colors"
+              className="w-full px-5 py-4 bg-white border border-border rounded-2xl focus:outline-none focus:border-accent placeholder:text-text-muted"
             />
             <div className="flex gap-3">
               <input
@@ -73,11 +51,11 @@ export const TestimonialsForm = () => {
                 placeholder="Email address"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="flex-1 bg-white border border-[#d4c9b0] rounded-xl px-4 py-3 text-sm text-[#1a3d2b] placeholder:text-[#a09880] focus:outline-none focus:border-[#1a3d2b] transition-colors"
+                className="flex-1 px-5 py-4 bg-white border border-border rounded-2xl focus:outline-none focus:border-accent placeholder:text-text-muted"
               />
               <button
                 type="submit"
-                className="bg-[#1a3d2b] text-[#e8c84a] text-[11px] font-black uppercase tracking-widest px-6 rounded-xl hover:bg-[#1a3d2b]/90 transition-colors"
+                className="bg-cta hover:bg-cta/90 text-white font-bold uppercase tracking-widest px-8 rounded-2xl transition-colors"
               >
                 Subscribe
               </button>
@@ -86,32 +64,33 @@ export const TestimonialsForm = () => {
         </motion.div>
 
         
-        <motion.div
-          initial={{ x: 20, opacity: 0 }}
-          whileInView={{ x: 0, opacity: 1 }}
-          viewport={{ once: true }}
-          transition={{ delay: 0.15 }}
-          className="col-span-6 relative"
-        >
-        
-          <div className="absolute -top-4 -left-4 w-full h-full bg-[#1a3d2b]/10 rounded-4xl" />
+<motion.div
+  initial={{ x: 30, opacity: 0 }}
+  whileInView={{ x: 0, opacity: 1 }}
+  className="col-span-12 lg:col-span-6 relative"
+>
+  <div className="relative rounded-[3rem] overflow-hidden shadow-2xl border border-primary/5 h-150">
+    <Image
+      src="https://images.unsplash.com/photo-1594489428504-5c0c480a15fa?q=80&w=1000&auto=format&fit=crop"
+      alt="Local Organic Grower"
+      fill
+      className="object-cover"
+    />
+    <div className="absolute top-0 left-0 right-0 h-1.5 bg-accent" />
+  </div>
 
-          <div className="relative w-full h-125 rounded-4xl overflow-hidden shadow-xl border border-[#d4c9b0]">
-            
-            <div className="absolute top-0 left-0 right-0 h-0.75 bg-[#e8c84a] z-10" />
-            <Image
-              src="https://placehold.co/480x500/1a3d2b/f5f0e8?text=Happy+Farmer"
-              alt="Farmer testimonial"
-              fill
-              className="object-cover"
-            />
-          </div>
-
-          <div className="absolute -bottom-4 -left-4 bg-[#1a3d2b] rounded-2xl shadow-xl px-5 py-4 border border-[#e8c84a]/20">
-            <p className="text-3xl font-black text-[#e8c84a]">2,400+</p>
-            <p className="text-[9px] font-black uppercase tracking-widest text-[#f5f0e8]/50">Active Growers</p>
-          </div>
-        </motion.div>
+  <div className="absolute -bottom-8 -left-8 bg-bg-alt rounded-4xl shadow-2xl p-8 border border-border max-w-60">
+    <p className="text-4xl font-black text-primary mb-2">2,400+</p>
+    <p className="text-[10px] font-bold uppercase tracking-[0.2em] text-cta">Active Growers</p>
+    <div className="mt-4 flex -space-x-2">
+      {[1, 2, 3, 4].map(i => (
+        <div key={i} className="w-8 h-8 rounded-full border-2 border-bg-alt bg-primary/10 overflow-hidden relative">
+          <Image src={`https://i.pravatar.cc/100?img=${i + 15}`} alt="Avatar" fill />
+        </div>
+      ))}
+    </div>
+  </div>
+</motion.div>
       </div>
     </section>
   );

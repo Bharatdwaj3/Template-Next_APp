@@ -1,3 +1,4 @@
+// store/store.ts
 import { configureStore } from '@reduxjs/toolkit';
 import avatarReducer  from './avatarSlice';
 import contentReducer from './contentSlice';

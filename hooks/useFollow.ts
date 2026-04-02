@@ -1,22 +1,41 @@
+// hooks/useFollow.ts
 'use client';
-
+import { useState, useEffect } from 'react';
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
-import { toggleFollow } from '@/store/followSlice';
+import { followUserOnServer, unfollowUserFromServer, loadFollowingFromServer } from '@/store/followSlice';
+import { toast } from 'react-hot-toast';
 
-type EntityType = 'farmer' | 'grocer' | 'produce' | string;
+type EntityType = 'buyer' | 'farmer' | 'grocer';
 
-export function useFollow(type: EntityType, id: string) {
-  const dispatch  = useAppDispatch();
-  const following = useAppSelector((s) => s.follow.following);
+export function useFollow(type: EntityType, userId: string) {
+  const dispatch = useAppDispatch();
+  const following = useAppSelector((state) => state.follow.following);
+  const loading = useAppSelector((state) => state.follow.loading);
+  const [isToggling, setIsToggling] = useState(false);
+  
+  const isFollowing = following.includes(userId);
 
-  const key         = `${type}:${id}`;
-  const isFollowing = following.includes(key);
-  const toggle      = () => dispatch(toggleFollow(key));
+  // Load following list from server on mount
+  useEffect(() => {
+    dispatch(loadFollowingFromServer());
+  }, [dispatch]);
 
-  const getFollowedByType = (t: EntityType) =>
-    following
-      .filter((k) => k.startsWith(`${t}:`))
-      .map((k) => k.split(':')[1]);
+  const toggle = async () => {
+    setIsToggling(true);
+    try {
+      if (isFollowing) {
+        await dispatch(unfollowUserFromServer({ userId, type })).unwrap();
+        toast.success('Unfollowed successfully');
+      } else {
+        await dispatch(followUserOnServer({ userId, type })).unwrap();
+        toast.success('Followed successfully');
+      }
+    } catch (error: any) {
+      toast.error(error || 'Failed to update follow status');
+    } finally {
+      setIsToggling(false);
+    }
+  };
 
-  return { isFollowing, toggle, following, getFollowedByType };
+  return { isFollowing, toggle, loading: loading || isToggling };
 }

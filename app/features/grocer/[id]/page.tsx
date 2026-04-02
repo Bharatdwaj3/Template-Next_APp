@@ -1,12 +1,11 @@
 // features/grocer/[id]/page.tsx
 'use client';
-
 import { use, useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
 import {
-  MapPin, Phone, ArrowLeft, Package, Loader2, LogOut, Plus,
+  MapPin, Phone, ArrowLeft, Package, Loader2, LogOut,
 } from 'lucide-react';
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
 import { clearUser } from '@/store/avatarSlice';
@@ -42,13 +41,10 @@ export default function GrocerProfilePage({ params }: { params: Promise<{ id: st
   const router = useRouter();
   const dispatch = useAppDispatch();
   const currentUser = useAppSelector((s) => s.avatar.user);
-
   const { id } = use(params);
-
   const [grocer, setGrocer] = useState<GrocerProfile | null>(null);
   const [loading, setLoading] = useState(true);
   const [loggingOut, setLoggingOut] = useState(false);
-
   const { isFollowing, toggle } = useFollow('grocer', id);
   const isOwner = currentUser?.id === id;
 
@@ -57,11 +53,9 @@ export default function GrocerProfilePage({ params }: { params: Promise<{ id: st
       try {
         const res = await fetch(`/api/grocer/profile/${id}`);
         const data = await res.json();
-
         if (res.status === 401) { router.push('/features/auth/login'); return; }
         if (res.status === 403) { router.push('/unauthorized'); return; }
         if (!data.success) { setGrocer(null); return; }
-
         setGrocer(data.grocer);
       } catch (err) {
         console.error(err);
@@ -86,18 +80,19 @@ export default function GrocerProfilePage({ params }: { params: Promise<{ id: st
   };
 
   if (loading) return (
-    <div className="min-h-screen bg-[#f5f0e8] flex items-center justify-center pt-20">
-      <Loader2 className="w-8 h-8 text-[#1a3d2b] animate-spin" />
+    <div className="min-h-screen flex items-center justify-center bg-[#f5f0e8]">
+      <Loader2 className="animate-spin text-[#1a3d2b]" size={40} />
     </div>
   );
 
   if (!grocer) return (
-    <div className="min-h-screen bg-[#f5f0e8] flex flex-col items-center justify-center pt-20 gap-4">
-      <p className="text-[#8a9a8e] text-sm">Grocer not found.</p>
-      <Link href="/features/grocer"
-        className="text-[11px] font-black uppercase tracking-widest text-[#1a3d2b] border-b border-[#1a3d2b] pb-0.5">
-        ← All Grocers
-      </Link>
+    <div className="min-h-screen flex items-center justify-center bg-[#f5f0e8]">
+      <div className="text-center">
+        <p className="text-[#8a9a8e] mb-4">Grocer not found.</p>
+        <Link href="/features/grocer" className="flex items-center justify-center gap-2 text-[#1a3d2b] hover:underline">
+          <ArrowLeft size={16} /> All Grocers
+        </Link>
+      </div>
     </div>
   );
 
@@ -111,25 +106,25 @@ export default function GrocerProfilePage({ params }: { params: Promise<{ id: st
 
   return (
     <ProtectedRoute>
-      <div className="min-h-screen bg-[#f5f0e8] pt-20">
-        <div className="relative w-full h-56 bg-[#1a3d2b] overflow-hidden">
-          <div className="absolute right-0 top-0 bottom-0 w-40 flex items-center justify-center pointer-events-none overflow-hidden">
-            <span
-              className="text-[8rem] font-black text-white/4 uppercase select-none whitespace-nowrap"
-              style={{ writingMode: 'vertical-rl' }}
-            >
-              {grocer.shopName}
-            </span>
-          </div>
-          <div className="absolute top-0 left-0 right-0 h-0.75 bg-[#e8c84a]" />
+      <div className="bg-[#f5f0e8] min-h-screen pb-20">
+
+        {/* Header */}
+        <div className="bg-[#1a3d2b] py-16 px-6 relative overflow-hidden">
+          <span
+            className="text-[8rem] font-black text-white/10 uppercase select-none whitespace-nowrap absolute right-4 top-1/2 -translate-y-1/2"
+            style={{ writingMode: 'vertical-rl' }}
+          >
+            {grocer.shopName}
+          </span>
 
           <Link href="/features/grocer"
-            className="absolute top-4 left-6 flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-white/60 hover:text-white transition-colors">
+            className="absolute top-4 left-6 flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-white/60 hover:text-white transition-colors"
+          >
             <ArrowLeft size={13} /> All Grocers
           </Link>
 
           {isOwner && (
-            <div className="absolute top-4 right-6 flex items-center gap-3">
+            <div className="absolute top-4 right-6">
               <button
                 onClick={handleLogout}
                 disabled={loggingOut}
@@ -140,11 +135,21 @@ export default function GrocerProfilePage({ params }: { params: Promise<{ id: st
               </button>
             </div>
           )}
+
+          <div className="max-w-5xl mx-auto relative">
+            <p className="text-[10px] font-black uppercase tracking-[0.5em] text-[#e8c84a] mb-2">Verified Grocer</p>
+            <h1 className="text-5xl font-black text-white uppercase tracking-tight mb-4">
+              {grocer.shopName}
+            </h1>
+            <div className="w-12 h-0.5" style={{ background: 'linear-gradient(90deg, #e8c84a, transparent)' }} />
+          </div>
         </div>
 
-        <div className="max-w-5xl mx-auto px-6">
-          <div className="relative -mt-14 mb-10 flex items-end gap-5">
-            <div className="relative w-24 h-24 rounded-2xl overflow-hidden border-4 border-[#f5f0e8] shadow-xl shrink-0 bg-[#1a3d2b]/10">
+        <div className="max-w-5xl mx-auto px-6 py-10">
+
+          {/* Profile Info */}
+          <div className="flex items-start gap-6 mb-10">
+            <div className="relative w-24 h-24 rounded-2xl overflow-hidden border-4 border-white shadow-xl shrink-0 bg-[#1a3d2b]/10">
               {avatar ? (
                 <Image src={avatar} alt={fullName} fill className="object-cover" />
               ) : (
@@ -152,41 +157,38 @@ export default function GrocerProfilePage({ params }: { params: Promise<{ id: st
                   {fullName?.[0] ?? 'G'}
                 </div>
               )}
-              <div className="absolute top-0 left-0 right-0 h-0.75 bg-[#e8c84a]" />
             </div>
 
-            <div className="pb-1">
-              <p className="text-[10px] font-black uppercase tracking-[0.5em] text-[#e86c2a] mb-0.5">Verified Grocer</p>
-              <h1 className="text-3xl font-black text-[#1a3d2b] uppercase tracking-tight leading-none">
-                {grocer.shopName}
-              </h1>
-              <div className="flex items-center gap-4 mt-2 text-[11px] text-[#8a9a8e]">
-                {location && (
-                  <span className="flex items-center gap-1">
-                    <MapPin size={11} className="text-[#e86c2a]" />{location}
-                  </span>
-                )}
-                <span>@{userName}</span>
-              </div>
+            <div className="flex-1">
+              <h2 className="text-2xl font-black text-[#1a3d2b] uppercase tracking-tight">{fullName}</h2>
+              <p className="text-[10px] font-black uppercase tracking-widest text-[#e86c2a] mb-2">@{userName}</p>
+              {location && (
+                <div className="flex items-center gap-1 text-[#8a9a8e]">
+                  <MapPin size={11} className="text-[#e86c2a]" />
+                  <span className="text-[10px]">{location}</span>
+                </div>
+              )}
             </div>
 
             {!isOwner && (
-              <div className="ml-auto pb-1 flex gap-2">
+              <div className="flex gap-2">
                 <button onClick={toggle}
                   className={`flex items-center gap-2 text-[10px] font-black uppercase tracking-widest px-5 py-2.5 rounded-xl transition-colors border ${
                     isFollowing
                       ? 'bg-[#f5f0e8] text-[#1a3d2b] border-[#1a3d2b]/30'
-                      : 'bg-white border-[#d4c9b0] text-[#1a3d2b] hover:border-[#1a3d2b]/40'
-                  }`}>
-                  {isFollowing ? 'Following' : '+ Follow'}
+                      : 'bg-[#1a3d2b] text-[#e8c84a] border-[#1a3d2b] hover:bg-[#2a5a3b]'
+                  }`}
+                >
+                  {isFollowing ? '✓ Following' : '+ Follow'}
                 </button>
-                <button className="flex items-center gap-2 bg-[#1a3d2b] text-[#e8c84a] text-[10px] font-black uppercase tracking-widest px-5 py-2.5 rounded-xl hover:bg-[#1a3d2b]/90 transition-colors">
+                <button className="flex items-center gap-2 bg-[#e86c2a] text-white text-[10px] font-black uppercase tracking-widest px-5 py-2.5 rounded-xl hover:bg-[#d45e1e] transition-colors">
                   <Phone size={12} /> Contact
                 </button>
               </div>
             )}
           </div>
 
+          {/* Stats */}
           <div className="grid grid-cols-3 gap-4 mb-10">
             {[
               { label: 'Followers', val: followerCount },
@@ -200,11 +202,13 @@ export default function GrocerProfilePage({ params }: { params: Promise<{ id: st
             ))}
           </div>
 
+          {/* Bio */}
           <div className="mb-12">
             <p className="text-[10px] font-black uppercase tracking-[0.5em] text-[#e86c2a] mb-3">About</p>
             <p className="text-sm text-[#4a5a4e] leading-relaxed">{grocer.bio || 'No bio provided yet.'}</p>
           </div>
 
+          {/* Saved Produce */}
           {savedCount > 0 && (
             <div className="mb-12">
               <h2 className="text-2xl font-black text-[#1a3d2b] uppercase tracking-tight mb-1">Saved Produce</h2>

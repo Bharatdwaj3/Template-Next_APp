@@ -1,9 +1,9 @@
 // components/PaymentButton.tsx
 'use client';
-
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { CreditCard, CheckCircle, XCircle, Loader2 } from 'lucide-react';
+import { api } from '@/lib/api';
 
 interface PaymentButtonProps {
   cartItems: Array<{
@@ -65,31 +65,25 @@ export default function PaymentButton({
       setIsLoading(true);
       setPaymentStatus('loading');
 
-      const verificationResult = await fetch('/api/payments/verify', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          razorpay_order_id: response.razorpay_order_id,
-          razorpay_payment_id: response.razorpay_payment_id,
-          razorpay_signature: response.razorpay_signature,
-          cartItems,
-          customerInfo,
-          amount,
-        }),
+      const verificationResult = await api.post('/payments/verify', {
+        razorpay_order_id: response.razorpay_order_id,
+        razorpay_payment_id: response.razorpay_payment_id,
+        razorpay_signature: response.razorpay_signature,
+        cartItems,
+        customerInfo,
+        amount,
       });
 
-      const data = await verificationResult.json();
-
-      if (data.success) {
+      if (verificationResult.success) {
         setPaymentStatus('success');
         if (onSuccess) onSuccess();
       } else {
-        throw new Error(data.message || 'Payment verification failed');
+        throw new Error(verificationResult.message || 'Payment verification failed');
       }
     } catch (error: any) {
       console.error('Payment verification error:', error);
       setPaymentStatus('error');
-      setErrorMessage(error.message || 'Verification failed');
+      setErrorMessage(error.data?.message || error.message || 'Verification failed');
       if (onFailure) onFailure(error);
     } finally {
       setIsLoading(false);
@@ -99,15 +93,11 @@ export default function PaymentButton({
   const handlePaymentFailure = async (response: any) => {
     try {
       console.log('Payment failed:', response);
-      await fetch('/api/payments/failure', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          order_id: response.error?.metadata?.order_id,
-          payment_id: response.error?.metadata?.payment_id,
-          error_code: response.error?.code,
-          error_description: response.error?.description,
-        }),
+      await api.post('/payments/failure', {
+        order_id: response.error?.metadata?.order_id,
+        payment_id: response.error?.metadata?.payment_id,
+        error_code: response.error?.code,
+        error_description: response.error?.description,
       });
 
       setPaymentStatus('error');
@@ -143,13 +133,7 @@ export default function PaymentButton({
 
       console.log('Creating order...', { amount, cartItems, customerInfo });
       
-      const orderResponse = await fetch('/api/payments/create-order', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ amount, cartItems, customerInfo }),
-      });
-
-      const orderData = await orderResponse.json();
+      const orderData = await api.post('/payments/create-order', { amount, cartItems, customerInfo });
 
       if (!orderData.success) {
         throw new Error(orderData.message || 'Failed to create order');
@@ -169,7 +153,7 @@ export default function PaymentButton({
           contact: customerInfo.phone || '',
         },
         theme: {
-          color: '#1a3d2b',
+          color: 'var(--color-primary)',
         },
         modal: {
           ondismiss: () => {
@@ -209,15 +193,10 @@ export default function PaymentButton({
     return `Pay ₹${amount.toFixed(2)}`;
   };
 
-  const getButtonColor = () => {
-    if (paymentStatus === 'success') return 'bg-green-600 hover:bg-green-700';
-    return 'bg-[#1a3d2b] hover:bg-[#2a5a3b]';
-  };
-
   return (
-    <div className="w-full">
+    <div className={`w-full ${className}`}>
       {paymentStatus === 'loading' && (
-        <div className="flex items-center gap-2 mb-4 text-blue-600">
+        <div className="flex items-center justify-center gap-2 mb-4 p-3 bg-primary/10 text-primary rounded-lg">
           <Loader2 className="animate-spin" size={20} />
           <span>Processing payment...</span>
         </div>
@@ -231,7 +210,7 @@ export default function PaymentButton({
       )}
 
       {paymentStatus === 'error' && (
-        <div className="flex items-center justify-between mb-4 p-3 bg-red-50 text-red-700 rounded-lg">
+        <div className="flex items-center justify-between mb-4 p-3 bg-cta/10 text-cta rounded-lg">
           <div className="flex items-center gap-2">
             <XCircle size={20} />
             <span>{errorMessage || 'Payment failed. Please try again.'}</span>
@@ -239,7 +218,7 @@ export default function PaymentButton({
           <button
             onClick={retryPayment}
             disabled={isLoading}
-            className="text-sm font-medium text-red-700 hover:text-red-900 underline"
+            className="text-sm font-medium text-cta hover:text-cta/80 underline"
           >
             Retry
           </button>
@@ -249,7 +228,11 @@ export default function PaymentButton({
       <button
         onClick={handlePayment}
         disabled={isLoading || paymentStatus === 'success'}
-        className={`w-full flex items-center justify-center gap-2 text-white font-bold py-3 px-4 rounded-xl transition-all duration-300 ${getButtonColor()} disabled:opacity-50 disabled:cursor-not-allowed ${className}`}
+        className={`w-full flex items-center justify-center gap-2 text-text-inverse font-bold py-3 px-4 rounded-xl transition-all duration-300 ${
+          paymentStatus === 'success'
+            ? 'bg-green-600 hover:bg-green-700'
+            : 'bg-primary hover:bg-primary-hover'
+        } disabled:opacity-50 disabled:cursor-not-allowed`}
       >
         {isLoading ? (
           <Loader2 className="animate-spin" size={20} />
@@ -262,8 +245,8 @@ export default function PaymentButton({
       </button>
 
       <div className="mt-4 text-center">
-        <p className="text-xs text-gray-500">Secure payment powered by Razorpay</p>
-        <p className="text-xs text-gray-400 mt-1">
+        <p className="text-xs text-text-muted">Secure payment powered by Razorpay</p>
+        <p className="text-xs text-text-muted mt-1">
           We accept all major credit cards, debit cards, net banking, UPI & wallets
         </p>
       </div>

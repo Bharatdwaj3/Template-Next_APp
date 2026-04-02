@@ -4,16 +4,14 @@ import { useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { motion, AnimatePresence } from 'framer-motion';
-import { 
-  ShoppingBasket, 
-  Leaf, 
-  Star, 
-  Eye, 
-  MapPin,
+import {
+  ShoppingBasket,
+  Leaf,
+  Star,
+  Eye,
   Clock,
   Package
 } from 'lucide-react';
-import { useCartContext } from '@/hooks/useCartContext';
 
 export interface Produce {
   _id: string;
@@ -66,7 +64,6 @@ export const ProduceCard = ({ produce, onAddToCart }: ProduceCardProps) => {
     const date = new Date(dateString);
     const now = new Date();
     const diffInHours = Math.floor((now.getTime() - date.getTime()) / (1000 * 60 * 60));
-    
     if (diffInHours < 24) {
       return `${diffInHours}h ago`;
     }
@@ -77,98 +74,100 @@ export const ProduceCard = ({ produce, onAddToCart }: ProduceCardProps) => {
   return (
     <Link href={`/features/produce/${produce._id}`} className="block">
       <motion.div
-        className="bg-white border border-[#d4c9b0] rounded-2xl overflow-hidden hover:border-[#1a3d2b]/40 hover:shadow-xl transition-all duration-300 group relative"
+        className="bg-bg-alt border border-border rounded-2xl overflow-hidden hover:border-primary/40 hover:shadow-xl transition-all duration-300 group relative"
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => setIsHovered(false)}
         whileHover={{ y: -4 }}
       >
-        {/* Image Container */}
-        <div className="relative h-64 bg-[#f5f0e8] overflow-hidden">
+        {/* Image Container - FIXED: Added proper wrapper with dimensions */}
+        <div className="relative w-full h-48 overflow-hidden bg-bg">
           {produce.img ? (
             <Image
               src={produce.img}
               alt={produce.name}
               fill
               className="object-cover group-hover:scale-110 transition-transform duration-500"
+              sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
             />
           ) : (
-            <div className="w-full h-full flex items-center justify-center">
-              <Package size={64} className="text-[#8a9a8e]" />
+            <div className="w-full h-full flex items-center justify-center bg-bg">
+              <Package size={64} className="text-text-muted" />
             </div>
           )}
-          
-          {/* Badges */}
-          <div className="absolute top-3 left-3 flex flex-col gap-2">
-            {produce.isOrganic && (
-              <span className="flex items-center gap-1 bg-[#1a3d2b] text-[#e8c84a] text-[9px] font-black px-2.5 py-1 rounded-full">
-                <Leaf size={10} /> ORGANIC
-              </span>
-            )}
-            {produce.stock <= 10 && produce.stock > 0 && (
-              <span className="bg-orange-100 text-orange-700 text-[9px] font-black px-2.5 py-1 rounded-full">
-                LOW STOCK
-              </span>
-            )}
-            {produce.stock === 0 && (
-              <span className="bg-red-100 text-red-700 text-[9px] font-black px-2.5 py-1 rounded-full">
-                OUT OF STOCK
-              </span>
-            )}
-          </div>
-
-          {/* Quick View Button */}
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: isHovered ? 1 : 0 }}
-            className="absolute top-3 right-3"
-          >
-            <div className="bg-white/90 backdrop-blur-sm p-2 rounded-full shadow-lg">
-              <Eye size={14} className="text-[#1a3d2b]" />
-            </div>
-          </motion.div>
         </div>
+
+        {/* Badges */}
+        <div className="absolute top-3 left-3 flex flex-col gap-2 z-10">
+          {produce.isOrganic && (
+            <span className="flex items-center gap-1 bg-primary text-accent text-[9px] font-black px-2.5 py-1 rounded-full">
+              <Leaf size={10} /> ORGANIC
+            </span>
+          )}
+          {produce.stock <= 10 && produce.stock > 0 && (
+            <span className="bg-orange-100 text-orange-700 text-[9px] font-black px-2.5 py-1 rounded-full">
+              LOW STOCK
+            </span>
+          )}
+          {produce.stock === 0 && (
+            <span className="bg-red-100 text-red-700 text-[9px] font-black px-2.5 py-1 rounded-full">
+              OUT OF STOCK
+            </span>
+          )}
+        </div>
+
+        {/* Quick View Button */}
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: isHovered ? 1 : 0 }}
+          className="absolute top-3 right-3 z-10"
+        >
+          <div className="bg-bg-alt/90 backdrop-blur-sm p-2 rounded-full shadow-lg">
+            <Eye size={14} className="text-primary" />
+          </div>
+        </motion.div>
 
         {/* Content */}
         <div className="p-5">
           {/* Category */}
-          <p className="text-[9px] font-black uppercase tracking-widest text-[#e86c2a] mb-1">
+          <p className="text-[9px] font-black uppercase tracking-widest text-cta mb-1">
             {produce.category}
           </p>
 
           {/* Title */}
-          <h3 className="text-lg font-black text-[#1a3d2b] uppercase tracking-tight mb-2 line-clamp-1">
+          <h3 className="text-lg font-black text-primary uppercase tracking-tight mb-2 line-clamp-1">
             {produce.name}
           </h3>
 
           {/* Farmer Info */}
           <div className="flex items-center gap-2 mb-3">
             {produce.farmerId.avatar ? (
-              <Image
-                src={produce.farmerId.avatar}
-                alt={produce.farmerId.fullName}
-                width={20}
-                height={20}
-                className="rounded-full object-cover"
-              />
+              <div className="relative w-5 h-5 rounded-full overflow-hidden">
+                <Image
+                  src={produce.farmerId.avatar}
+                  alt={produce.farmerId.fullName}
+                  fill
+                  className="object-cover"
+                />
+              </div>
             ) : (
-              <div className="w-5 h-5 rounded-full bg-[#1a3d2b]/10 flex items-center justify-center">
-                <span className="text-[8px] font-black text-[#1a3d2b]">
+              <div className="w-5 h-5 rounded-full bg-primary/10 flex items-center justify-center">
+                <span className="text-[8px] font-black text-primary">
                   {produce.farmerId.fullName?.[0]}
                 </span>
               </div>
             )}
-            <span className="text-[10px] text-[#8a9a8e]">
+            <span className="text-[10px] text-text-muted">
               by {produce.farmerId.fullName}
             </span>
           </div>
 
           {/* Rating */}
           <div className="flex items-center gap-1 mb-3">
-            <Star size={12} className="fill-[#e86c2a] text-[#e86c2a]" />
-            <span className="text-sm font-bold text-[#e86c2a]">
+            <Star size={12} className="fill-cta text-cta" />
+            <span className="text-sm font-bold text-cta">
               {produce.rating || 0}
             </span>
-            <span className="text-[10px] text-[#8a9a8e]">
+            <span className="text-[10px] text-text-muted">
               ({produce.totalReviews || 0} reviews)
             </span>
           </div>
@@ -176,23 +175,23 @@ export const ProduceCard = ({ produce, onAddToCart }: ProduceCardProps) => {
           {/* Price and Add Button */}
           <div className="flex items-center justify-between">
             <div>
-              <span className="text-2xl font-black text-[#e86c2a]">
+              <span className="text-2xl font-black text-cta">
                 ₹{produce.price}
               </span>
-              <span className="text-[10px] text-[#8a9a8e] ml-1">
+              <span className="text-[10px] text-text-muted ml-1">
                 /{produce.unit}
               </span>
             </div>
-            
+          
             <motion.button
               onClick={handleAddToCart}
               disabled={produce.stock === 0 || isAdding}
               className={`flex items-center gap-1.5 px-4 py-2 rounded-xl font-bold text-[10px] uppercase tracking-wider transition-all ${
                 produce.stock === 0
-                  ? 'bg-[#d4c9b0] text-[#8a9a8e] cursor-not-allowed'
+                  ? 'bg-border text-text-muted cursor-not-allowed'
                   : isAdding
-                  ? 'bg-[#2a5a3b] text-[#e8c84a]'
-                  : 'bg-[#1a3d2b] text-[#e8c84a] hover:bg-[#2a5a3b]'
+                  ? 'bg-primary-hover text-accent'
+                  : 'bg-primary text-accent hover:bg-primary-hover'
               }`}
               whileTap={{ scale: 0.95 }}
             >
@@ -201,7 +200,7 @@ export const ProduceCard = ({ produce, onAddToCart }: ProduceCardProps) => {
                   <motion.div
                     animate={{ rotate: 360 }}
                     transition={{ duration: 0.5, repeat: Infinity, ease: "linear" }}
-                    className="w-3 h-3 border-2 border-[#e8c84a] border-t-transparent rounded-full"
+                    className="w-3 h-3 border-2 border-accent border-t-transparent rounded-full"
                   />
                   Added
                 </>
@@ -222,24 +221,24 @@ export const ProduceCard = ({ produce, onAddToCart }: ProduceCardProps) => {
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: 10 }}
-              className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-[#1a3d2b] via-[#1a3d2b]/95 to-transparent p-5 pt-16"
+              className="absolute inset-x-0 bottom-0 bg-linear-to-t from-primary via-primary/95 to-transparent p-5 pt-16 z-10"
             >
               {/* Description */}
-              <p className="text-[11px] text-white/90 mb-3 line-clamp-2 leading-relaxed">
+              <p className="text-[11px] text-text-inverse/90 mb-3 line-clamp-2 leading-relaxed">
                 {produce.description || 'Fresh organic produce from local farms'}
               </p>
 
               {/* Quick Stats */}
               <div className="flex items-center gap-4 mb-3">
                 <div className="flex items-center gap-1">
-                  <Clock size={11} className="text-[#e8c84a]" />
-                  <span className="text-[9px] text-white/80">
+                  <Clock size={11} className="text-accent" />
+                  <span className="text-[9px] text-text-inverse/80">
                     Listed {formatDate(produce.createdAt)}
                   </span>
                 </div>
                 <div className="flex items-center gap-1">
-                  <Package size={11} className="text-[#e8c84a]" />
-                  <span className="text-[9px] text-white/80">
+                  <Package size={11} className="text-accent" />
+                  <span className="text-[9px] text-text-inverse/80">
                     {produce.stock} {produce.unit} available
                   </span>
                 </div>
@@ -260,8 +259,8 @@ export const ProduceCard = ({ produce, onAddToCart }: ProduceCardProps) => {
                     ? `Only ${produce.stock} left`
                     : 'Out of Stock'}
                 </div>
-                
-                <span className="text-[9px] text-white/60 uppercase tracking-wider">
+              
+                <span className="text-[9px] text-text-inverse/60 uppercase tracking-wider">
                   Click for details →
                 </span>
               </div>

@@ -1,3 +1,5 @@
+//api/auth/profile/route.ts
+
 import { NextResponse } from 'next/server';
 import User from '@/model/user.model';
 import { connectDB } from '@/lib/db';
@@ -16,7 +18,7 @@ export async function GET() {
     }
 
     const profile = await User.findById(currentUser.id)
-      .select('-password -refreshToken -googleId -discordId');
+      .select('-password -refreshToken');
 
     if (!profile) {
       return NextResponse.json(

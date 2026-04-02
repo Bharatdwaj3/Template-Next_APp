@@ -1,115 +1,59 @@
-import Image from 'next/image';
+'use client';
+import { Sprout, Instagram, Twitter, Facebook, ArrowUpRight } from 'lucide-react';
 import Link from 'next/link';
-import { Sprout } from 'lucide-react';
 
-const footerLinks: Record<string, string[]> = {
-  Mission:       ['Overview', 'Locations', 'Sustainability', 'Sitemap'],
-  'Farming Log': ['Seasonal', 'Rainfall', 'Soil Tests', 'Archives'],
-  'Contact Form': ['Join Network', 'Wholesale', 'Cooperate', 'Media Hub'],
-};
+const FOOTER_LINKS = [
+  { title: 'Marketplace', links: ['Produce', 'Farmers', 'Sellers', 'Bulk'] },
+  { title: 'Company', links: ['Our Story', 'Sustainability', 'Log', 'Careers'] },
+  { title: 'Support', links: ['Help Center', 'Shipping', 'Terms', 'Privacy'] },
+];
 
-const socials = ['fb', 'ig', 'tw', 'yt'];
-
-export const Footer = () => (
-  <footer className="bg-[#0f2419] px-10 py-14 relative overflow-hidden">
-
-    <div className="absolute right-0 top-0 bottom-0 w-24 flex items-center justify-center overflow-hidden pointer-events-none">
-      <span
-        className="text-[8rem] font-black text-white/2 uppercase select-none whitespace-nowrap"
-        style={{ writingMode: 'vertical-rl', letterSpacing: '-0.05em' }}
-      >
-        Nerthus
-      </span>
-    </div>
-
-    <div className="max-w-6xl mx-auto grid grid-cols-12 gap-10 relative z-10">
-
-      <div className="col-span-3">
-        <div className="flex items-center gap-2 mb-1">
-          <Sprout className="w-5 h-5 text-[#e8c84a]" />
-          <span className="text-white font-black text-lg tracking-tight uppercase italic">Nerthus</span>
-        </div>
-        <div className="w-8 h-0.5 mb-4" style={{ background: 'linear-gradient(90deg, #e8c84a, transparent)' }} />
-        <p className="text-[11px] text-white/40 leading-relaxed max-w-45">
-          Rooted in tradition, growing toward tomorrow. Connecting farmers and families since ancient soil.
-        </p>
-        <div className="flex gap-3 mt-6">
-          {socials.map((s) => (
-            <div
-              key={s}
-              className="w-8 h-8 rounded-full bg-white/5 hover:bg-[#e8c84a]/20 cursor-pointer transition-colors flex items-center justify-center border border-white/10 hover:border-[#e8c84a]/30"
-            >
-              <span className="text-[9px] font-black text-white/40 uppercase">{s}</span>
+export const Footer = () => {
+  return (
+    <footer className="bg-primary pt-24 pb-12 px-8 lg:px-24 text-bg relative overflow-hidden">
+      <div className="max-w-7xl mx-auto">
+        <div className="grid grid-cols-12 gap-12 mb-20">
+          <div className="col-span-12 lg:col-span-4">
+            <div className="flex items-center gap-3 mb-8">
+              <div className="w-10 h-10 bg-accent rounded-xl flex items-center justify-center text-primary">
+                <Sprout size={24} />
+              </div>
+              <span className="text-2xl font-black uppercase tracking-tighter">Nerthus</span>
             </div>
-          ))}
-        </div>
-      </div>
-
-      {Object.entries(footerLinks).map(([heading, links]) => (
-        <div key={heading} className="col-span-2">
-          <p className="text-[10px] font-black uppercase tracking-[0.3em] text-[#e8c84a]/40 mb-5">{heading}</p>
-          <ul className="space-y-3">
-            {links.map((l) => (
-              <li key={l}>
-                <Link
-                  href={`/${l.toLowerCase().replace(/\s+/g, '-')}`}
-                  className="text-[11px] text-white/40 hover:text-[#e8c84a] transition-colors"
-                >
-                  {l}
-                </Link>
-              </li>
-            ))}
-          </ul>
-        </div>
-      ))}
-
-      <div className="col-span-3">
-        <p className="text-[10px] font-black uppercase tracking-[0.3em] text-[#e8c84a]/40 mb-4">
-          Contact Drop
-        </p>
-        <div className="flex items-center gap-2 mb-2">
-          <div className="relative w-8 h-8 rounded-full overflow-hidden border border-[#e8c84a]/20">
-            <Image
-              src="https://placehold.co/32x32/1a3d2b/e8c84a?text=N"
-              alt="Avatar"
-              fill
-              className="object-cover"
-            />
+            <p className="text-bg/60 text-base leading-relaxed mb-8 max-w-xs">
+              Rooted in tradition, grown for tomorrow. Connecting local farmers with families.
+            </p>
           </div>
-          <p className="text-[11px] font-black text-white">Drop a Line</p>
-        </div>
-        <p className="text-[10px] text-white/30 leading-relaxed mb-4">
-          Subscribe to seasonal harvest updates and farming tips.
-        </p>
-        <div className="flex gap-2">
-          <input
-            type="email"
-            placeholder="Enter address"
-            className="flex-1 bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-[11px] text-white placeholder:text-white/20 focus:outline-none focus:border-[#e8c84a]/30 transition-colors"
-          />
-          <button
-            type="button"
-            className="w-8 h-8 bg-[#e8c84a] rounded-lg flex items-center justify-center hover:bg-[#d4b430] transition-colors shrink-0"
-          >
-            <span className="text-[#1a3d2b] text-xs font-black">→</span>
-          </button>
-        </div>
-      </div>
-    </div>
 
-    <div className="max-w-6xl mx-auto mt-12 pt-6 border-t border-white/5 flex items-center justify-between relative z-10">
-      <p className="text-[10px] text-white/20">© 2025 Nerthus. All rights reserved.</p>
-      <div className="flex gap-6">
-        {['Privacy', 'Terms', 'Cookies'].map((l) => (
-          <Link
-            key={l}
-            href={`/${l.toLowerCase()}`}
-            className="text-[10px] text-white/20 hover:text-[#e8c84a]/60 transition-colors"
-          >
-            {l}
-          </Link>
-        ))}
+          <div className="col-span-12 lg:col-span-5 grid grid-cols-3 gap-8">
+            {FOOTER_LINKS.map((group) => (
+              <div key={group.title}>
+                <h4 className="text-accent text-[11px] font-black uppercase tracking-[0.3em] mb-6">{group.title}</h4>
+                <ul className="space-y-4">
+                  {group.links.map((link) => (
+                    <li key={link}>
+                      <Link href="#" className="text-bg/50 hover:text-bg text-sm transition-colors flex items-center group">
+                        {link} <ArrowUpRight size={12} className="ml-1 opacity-0 group-hover:opacity-100" />
+                      </Link>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            ))}
+          </div>
+
+          <div className="col-span-12 lg:col-span-3">
+            <h4 className="text-accent text-[11px] font-black uppercase tracking-[0.3em] mb-6">Join the list</h4>
+            <form className="relative">
+              <input type="email" placeholder="Email" className="w-full bg-white/5 border border-white/10 rounded-2xl py-4 px-5 focus:outline-none focus:border-accent text-sm text-bg" />
+              <button className="absolute right-2 top-2 bottom-2 bg-accent text-primary px-4 rounded-xl font-bold text-xs uppercase">Join</button>
+            </form>
+          </div>
+        </div>
+        <div className="pt-12 border-t border-white/5 text-[10px] font-bold uppercase tracking-widest text-bg/30 text-center md:text-left">
+          © 2026 Nerthus. All Rights Reserved.
+        </div>
       </div>
-    </div>
-  </footer>
-);
+    </footer>
+  );
+};

@@ -1,38 +1,36 @@
+// hooks/useNavbar.tsx
 'use client';
-
 import { useEffect, useRef, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
 import { fetchUser, clearUser } from '@/store/avatarSlice';
+import { api } from '@/lib/api';
 
 export function useNavbar() {
   const dispatch = useAppDispatch();
-  const router   = useRouter();
-
+  const router = useRouter();
   const { user, loading } = useAppSelector((state) => state.avatar);
   const hasFetched = useRef(false);
-
-  const [isMenuOpen,   setIsMenuOpen]   = useState(false);
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
-  const [searchQuery,  setSearchQuery]  = useState('');
+  const [searchQuery, setSearchQuery] = useState('');
 
   useEffect(() => {
-
     if (!user && !loading && !hasFetched.current) {
-        hasFetched.current = true;
-        dispatch(fetchUser());
+      hasFetched.current = true;
+      dispatch(fetchUser());
     }
   }, [dispatch, user, loading]);
 
   const handleLogout = async () => {
     try {
-      await fetch('/api/auth/logout', { method: 'POST' });
+      await api.post('/auth/logout');
       dispatch(clearUser());
       hasFetched.current = false;
       setIsMenuOpen(false);
-      router.push('/features/auth/login');
-    } catch {
-      console.error('Logout failed');
+      router.push('/');  
+    } catch (error) {
+      console.error('Logout failed:', error);
     }
   };
 

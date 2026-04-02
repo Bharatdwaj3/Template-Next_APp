@@ -1,9 +1,10 @@
+// hooks/useProduceDetail.ts
 'use client';
-
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAppDispatch } from '@/store/hooks';
 import { markProduceVisited } from '@/store/contentSlice';
+import { api } from '@/lib/api';
 
 interface Produce {
   id:          string;
@@ -25,7 +26,6 @@ interface Produce {
 export function useProduceDetail(id: string) {
   const router   = useRouter();
   const dispatch = useAppDispatch();
-
   const [produce, setProduce] = useState<Produce | null>(null);
   const [loading, setLoading] = useState(true);
 
@@ -34,10 +34,9 @@ export function useProduceDetail(id: string) {
 
     const fetchProduce = async () => {
       try {
-        const res  = await fetch(`/api/produce/${id}`);
-        const data = await res.json();
+        const data = await api.get(`/produce/details/${id}`);
 
-        if (!res.ok || !data.success) {
+        if (!data) {
           router.replace('/features/produce');
           return;
         }

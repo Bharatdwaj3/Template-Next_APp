@@ -1,6 +1,7 @@
+// hooks/useProduceList.ts
 'use client';
-
 import { useMemo, useEffect, useState } from 'react';
+import { api } from '@/lib/api';
 
 interface Produce {
   id:       string;
@@ -14,7 +15,7 @@ interface Produce {
 }
 
 export function useProduceList(ids: string[], enabled = true) {
-  const [produce,  setProduce]  = useState<Produce[]>([]);
+  const [produce, setProduce] = useState<Produce[]>([]);
   const [fetching, setFetching] = useState(false);
   const stableIds = useMemo(() => ids, [ids]);
 
@@ -29,8 +30,7 @@ export function useProduceList(ids: string[], enabled = true) {
       try {
         const results = await Promise.all(
           stableIds.map((id) =>
-            fetch(`/api/produce/${id}`)
-              .then((r) => r.json())
+            api.get(`/produce/details/${id}`)
               .then((d) => (d.success ? d.produce : null))
               .catch(() => null)
           )

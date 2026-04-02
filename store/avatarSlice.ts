@@ -1,5 +1,7 @@
+// store/avatarSlice.ts
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import type { RootState } from './store';
+import { api } from '@/lib/api';
 
 const loadUserFromStorage = () => {
   if (typeof window === 'undefined') return null;
@@ -19,7 +21,6 @@ const persistUserToStorage = (user: any) => {
     localStorage.removeItem('auth_user');
   }
 };
-
 
 export interface NerthusUser {
   id:          string;
@@ -49,67 +50,64 @@ export const fetchUser = createAsyncThunk(
   'avatar/fetchUser',
   async (_, { rejectWithValue, getState }) => {
     const state = getState() as RootState;
-    if (state.avatar.user){
-      return {skip: true};
+    if (state.avatar.user) {
+      return { skip: true };
     }
 
     try {
-      let res = await fetch('/api/auth/profile');
-
-      if (res.status === 401) {
-        const refresh = await fetch('/api/auth/refresh', { method: 'POST' });
-        if (!refresh.ok) return rejectWithValue(null);
-        res = await fetch('/api/auth/profile');
+      const data = await api.get('/auth/profile');
+      
+      if (!data.success) {
+        return rejectWithValue(null);
       }
-
-      if (!res.ok) return rejectWithValue(null);
-
-      const data = await res.json();
-      if (!data.success) return rejectWithValue(null);
+      
       return data.user as NerthusUser;
-    } catch {
+    } catch (error: any) {
       return rejectWithValue(null);
     }
   }
 );
-
 const avatarSlice = createSlice({
   name: 'avatar',
   initialState,
   reducers: {
-    setUser:(state, action)=>{
-      state.user=action.payload;
-      state.error=null;
-      state.loading=false;
+    setUser: (state, action) => {
+      state.user = action.payload;
+      state.error = null;
+      state.loading = false;
       persistUserToStorage(action.payload);
     },
     clearUser: (state) => {
-      state.user    = null;
-      state.error   = null;
+      state.user = null;
+      state.error = null;
       state.loading = false;
       persistUserToStorage(null);
     },
-    setLoading:(state, action)=>{
-      state.loading=action.payload;
+
+    setLoading: (state, action) => {
+      state.loading = action.payload;
     },
   },
+
   extraReducers: (builder) => {
     builder
-    .addCase(fetchUser.pending, (state)=>{
-      state.loading=true;
-      state.error=null;
-    })
-    .addCase(fetchUser.fulfilled, (state, action) => {
-    state.loading = false;
-    if(action.payload && !(action.payload as any).skip){
-      state.user=action.payload as NerthusUser;
-      persistUserToStorage(action.payload)
-    }
-    })
-    .addCase(fetchUser.rejected, (state, action) => {
-      state.loading = false;
-      state.error    = 'Failed to load user';
-    });
+      .addCase(fetchUser.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+
+      .addCase(fetchUser.fulfilled, (state, action) => {
+        state.loading = false;
+        if (action.payload && !(action.payload as any).skip) {
+          state.user = action.payload as NerthusUser;
+          persistUserToStorage(action.payload);
+        }
+      })
+
+      .addCase(fetchUser.rejected, (state, action) => {
+        state.loading = false;
+        state.error = 'Failed to load user';
+      });
   },
 });
 

@@ -108,8 +108,6 @@ const displayFollowingCount = isOwner ? localFollowing.length : (grocer?.followi
   const userName = grocer.userId?.userName || '';
   const location = grocer.location?.address || '';
   const savedCount = grocer.savedProduce?.length || 0;
-  const likedCount = grocer.likedProduce?.length || 0;
-  const followerCount = grocer.followers?.length || 0;
 
   return (
     <ProtectedRoute>

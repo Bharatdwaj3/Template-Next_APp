@@ -1,19 +1,35 @@
 // features/farmer/[id]/page.tsx
+
 'use client';
 import React, { use, useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
+import dynamic from 'next/dynamic';
 import {
   MapPin, ArrowLeft, Package, Loader2, LogOut, Plus, X,
   Users, ShoppingBasket, Edit, Trash2,
+  Eye, TrendingUp, Sparkles, Clock, Package as PackageIcon,
+  Award,
+  ChevronRight
 } from 'lucide-react';
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
 import { clearUser } from '@/store/avatarSlice';
-import { clearFollowing } from '@/store/followSlice';
+import { clearFollowing,setFollowerCount }  from '@/store/followSlice';
 import ProtectedRoute from '@/components/ProtectedRoute';
 import { clearSavedProduce, markProduceVisited } from '@/store/contentSlice';
 import { useFollow } from '@/hooks/useFollow';
+
+import { useVisitedProduce } from '@/hooks/useVisitedProduce';
+
+const LocationMap = dynamic(() => import('@/components/LocationMap'), {
+  ssr: false,
+  loading: () => (
+    <div className="flex items-center justify-center h-100 bg-bg rounded-xl">
+      <Loader2 className="animate-spin text-primary" size={32} />
+    </div>
+  ),
+});
 
 interface FarmerProfile {
   _id: string;
@@ -69,13 +85,15 @@ export default function FarmerProfilePage({ params }: { params: Promise<{ id: st
   const [produceloading, setProduceLoading] = useState(false);
 
   const { isFollowing, toggle } = useFollow(id);
-  const isOwner = currentUser?.id === id;
-  const localFollowing = useAppSelector((state) => state.follow.following);  // ✅ ADD THIS
+  
+  const localFollowing = useAppSelector((state) => state.follow.following);
+  const displayFollowerCount = useAppSelector((state) => state.follow.followerCount);
 
-// Calculate display counts
-const displayFollowerCount = isOwner ? localFollowing.length : (farmer?.followers?.length ?? 0);
-const displayFollowingCount = isOwner ? localFollowing.length : (farmer?.following?.length ?? 0);
+  const isOwner = currentUser?.id?.toString() === id?.toString();
+  
+  const { visitedProduce, loading: visitedLoading, clearHistory, visitedCount } = useVisitedProduce();
 
+  const displayFollowingCount = localFollowing.length;
   useEffect(() => {
     const loadFarmer = async () => {
       try {
@@ -85,6 +103,7 @@ const displayFollowingCount = isOwner ? localFollowing.length : (farmer?.followi
         if (res.status === 403) { router.push('/unauthorized'); return; }
         if (!data.success) { setFarmer(null); return; }
         setFarmer(data.farmer);
+        dispatch(setFollowerCount(data.farmer?.followers?.length ?? 0));
       } catch (err) {
         console.error(err);
         setFarmer(null);
@@ -203,13 +222,10 @@ const displayFollowingCount = isOwner ? localFollowing.length : (farmer?.followi
   const location = farmer.location?.address || '';
   const isOrganic = farmer.farmType?.includes('organic') || farmer.farmType?.includes('natural');
 
-  
-
   return (
     <ProtectedRoute>
       <div className="bg-[#f5f0e8] min-h-screen pb-20">
 
-        {/* Header */}
         <div className="bg-[#1a3d2b] py-16 px-6 relative overflow-hidden">
           <span
             className="text-[8rem] font-black text-white/10 uppercase select-none whitespace-nowrap absolute right-4 top-1/2 -translate-y-1/2"
@@ -246,7 +262,6 @@ const displayFollowingCount = isOwner ? localFollowing.length : (farmer?.followi
 
         <div className="max-w-6xl mx-auto px-6 py-10">
 
-          {/* Profile Info */}
           <div className="flex items-start gap-6 mb-10">
             <div className="relative w-24 h-24 rounded-2xl overflow-hidden border-4 border-white shadow-xl shrink-0 bg-[#1a3d2b]/10">
               {avatar ? (
@@ -283,24 +298,21 @@ const displayFollowingCount = isOwner ? localFollowing.length : (farmer?.followi
             )}
           </div>
 
-          {/* Stats */}
-         {/* Stats */}
-<div className="grid grid-cols-3 gap-4 mb-10">
-  <div className="bg-white border border-[#d4c9b0] rounded-2xl px-6 py-5 text-center">
-    <p className="text-3xl font-black text-[#1a3d2b]">{displayFollowerCount}</p>
-    <p className="text-[9px] font-black uppercase tracking-[0.4em] text-[#8a9a8e] mt-1">FOLLOWERS</p>
-  </div>
-  <div className="bg-white border border-[#d4c9b0] rounded-2xl px-6 py-5 text-center">
-    <p className="text-3xl font-black text-[#1a3d2b]">{displayFollowingCount}</p>
-    <p className="text-[9px] font-black uppercase tracking-[0.4em] text-[#8a9a8e] mt-1">FOLLOWING</p>
-  </div>
-  <div className="bg-white border border-[#d4c9b0] rounded-2xl px-6 py-5 text-center">
-    <p className="text-3xl font-black text-[#1a3d2b]">{farmer.produce?.length ?? 0}</p>
-    <p className="text-[9px] font-black uppercase tracking-[0.4em] text-[#8a9a8e] mt-1">PRODUCTS</p>
-  </div>
-</div>
+          <div className="grid grid-cols-3 gap-4 mb-10">
+            <div className="bg-white border border-[#d4c9b0] rounded-2xl px-6 py-5 text-center">
+              <p className="text-3xl font-black text-[#1a3d2b]">{displayFollowerCount}</p>
+              <p className="text-[9px] font-black uppercase tracking-[0.4em] text-[#8a9a8e] mt-1">FOLLOWERS</p>
+            </div>
+            <div className="bg-white border border-[#d4c9b0] rounded-2xl px-6 py-5 text-center">
+              <p className="text-3xl font-black text-[#1a3d2b]">{displayFollowingCount}</p>
+              <p className="text-[9px] font-black uppercase tracking-[0.4em] text-[#8a9a8e] mt-1">FOLLOWING</p>
+            </div>
+            <div className="bg-white border border-[#d4c9b0] rounded-2xl px-6 py-5 text-center">
+              <p className="text-3xl font-black text-[#1a3d2b]">{farmer.produce?.length ?? 0}</p>
+              <p className="text-[9px] font-black uppercase tracking-[0.4em] text-[#8a9a8e] mt-1">PRODUCTS</p>
+            </div>
+          </div>
 
-          {/* Bio + Specialties */}
           <div className="grid grid-cols-12 gap-8 mb-12">
             <div className="col-span-8">
               <p className="text-[10px] font-black uppercase tracking-[0.5em] text-[#e86c2a] mb-3">About</p>
@@ -323,9 +335,8 @@ const displayFollowingCount = isOwner ? localFollowing.length : (farmer?.followi
             </div>
           </div>
 
-          {/* Tabs */}
           <div className="flex gap-1 mb-8 bg-white rounded-xl p-1.5 border border-[#d4c9b0] w-fit">
-            {['Produce', 'Sellers', 'Buyers'].map((label, i) => (
+            {['Produce', 'Sellers', 'Buyers', 'Location'].map((label, i) => (
               <button
                 key={label}
                 onClick={() => setActiveTab(i)}
@@ -340,7 +351,6 @@ const displayFollowingCount = isOwner ? localFollowing.length : (farmer?.followi
             ))}
           </div>
 
-          {/* Tab Content */}
           <div className="min-h-96">
             {activeTab === 0 && (
               <div>
@@ -436,22 +446,151 @@ const displayFollowingCount = isOwner ? localFollowing.length : (farmer?.followi
             )}
 
             {activeTab === 2 && (
-              <div>
-                <h2 className="text-2xl font-black text-[#1a3d2b] uppercase tracking-tight mb-6">Buyers & Grocers</h2>
-                <div className="bg-white border border-[#d4c9b0] rounded-2xl p-12 text-center">
-                  <ShoppingBasket size={48} className="mx-auto text-[#8a9a8e] mb-4" />
-                  <p className="text-lg text-[#1a3d2b] font-semibold mb-2">Browse Buyers</p>
-                  <p className="text-sm text-[#8a9a8e] mb-6">Connect with grocers and buyers looking for fresh produce</p>
-                  <Link href="/features/buyer" className="inline-flex items-center gap-2 bg-[#e8c84a] text-[#1a3d2b] px-5 py-2.5 rounded-xl hover:bg-[#e8c84a]/90 transition-colors font-bold text-sm">
-                    <ShoppingBasket size={16} /> View All Buyers
-                  </Link>
+  <div className="bg-white border border-[#d4c9b0] rounded-2xl p-8">
+    <div className="flex justify-between items-center mb-6">
+      <div className="flex items-center gap-2">
+        <Eye size={18} className="text-[#e86c2a]" />
+        <h2 className="text-sm font-black uppercase tracking-[0.3em] text-[#1a3d2b]">RECENTLY VIEWED</h2>
+      </div>
+      {visitedCount > 0 && (
+        <button
+          onClick={clearHistory}
+          className="flex items-center gap-1 text-[10px] text-[#8a9a8e] hover:text-red-500 transition-colors"
+        >
+          <Trash2 size={12} /> Clear History
+        </button>
+      )}
+    </div>
+
+    {visitedLoading ? (
+      <div className="flex items-center justify-center py-12">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[#1a3d2b]"></div>
+      </div>
+    ) : visitedProduce.length > 0 ? (
+      <div className="space-y-4">
+        {visitedProduce.map((item, index) => (
+          <Link
+            key={item._id}
+            href={`/features/produce/${item._id}`}
+            className="flex items-center gap-4 p-4 bg-[#f5f0e8] rounded-xl hover:bg-[#e8e0d0] transition-all group"
+          >
+            <div className="w-12 h-12 rounded-lg bg-white overflow-hidden relative shrink-0">
+              {item.img ? (
+                <Image src={item.img} alt={item.name} fill className="object-cover" />
+              ) : (
+                <div className="w-full h-full flex items-center justify-center">
+                  <PackageIcon size={20} className="text-[#8a9a8e]" />
+                </div>
+              )}
+            </div>
+            <div className="flex-1">
+              <div className="flex items-center gap-2">
+                <h3 className="font-bold text-[#1a3d2b] text-sm">{item.name}</h3>
+                {item.isOrganic && (
+                  <span className="text-[8px] bg-[#1a3d2b] text-[#e8c84a] px-1.5 py-0.5 rounded-full">
+                    ORGANIC
+                  </span>
+                )}
+              </div>
+              <p className="text-[10px] text-[#8a9a8e]">by {item.farmerId?.fullName || 'Local Farmer'}</p>
+              <div className="flex items-center gap-2 mt-1">
+                <span className="text-[11px] font-bold text-[#e86c2a]">₹{item.price}</span>
+                <span className="text-[9px] text-[#8a9a8e]">per {item.unit}</span>
+              </div>
+            </div>
+            <div className="text-right">
+              <Clock size={12} className="text-[#8a9a8e] mx-auto mb-1" />
+              <p className="text-[9px] font-bold text-[#1a3d2b]">#{index + 1}</p>
+            </div>
+            <ChevronRight size={16} className="text-[#8a9a8e] group-hover:text-[#1a3d2b]" />
+          </Link>
+        ))}
+        
+        <div className="mt-6 pt-4 border-t border-[#d4c9b0]">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-full bg-green-100 flex items-center justify-center">
+              <Award size={20} className="text-[#1a3d2b]" />
+            </div>
+            <div>
+              <p className="text-sm font-bold text-[#1a3d2b]">Browsing Activity</p>
+              <p className="text-[10px] text-[#8a9a8e]">You&apos;ve viewed {visitedCount} {visitedCount === 1 ? 'product' : 'products'} recently</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    ) : (
+      <div className="text-center py-12">
+        <Sparkles size={48} className="mx-auto text-[#8a9a8e] mb-4" />
+        <p className="text-lg text-[#1a3d2b] font-semibold mb-2">No activity yet</p>
+        <p className="text-sm text-[#8a9a8e]">Browse produce to see your recent activity here</p>
+        <Link
+          href="/features/produce"
+          className="inline-flex items-center gap-2 mt-6 text-[10px] font-bold text-[#e86c2a] hover:underline"
+        >
+          Start Exploring <TrendingUp size={14} />
+        </Link>
+      </div>
+    )}
+  </div>
+)}
+
+            {activeTab === 3 && (
+              <div className="space-y-6">
+                <div>
+                  <h2 className="text-2xl font-black text-[#1a3d2b] uppercase tracking-tight mb-1">Farm Location</h2>
+                  <div className="w-10 h-0.5 mb-6 bg-[#e8c84a]" />
+                  
+                  {farmer.location?.coordinates && farmer.location.coordinates.length === 2 ? (
+                    <>
+                      <LocationMap 
+                        singleLocation={{
+                          id: farmer._id,
+                          type: 'farmer',
+                          name: fullName,
+                          address: farmer.location?.address || 'Address not available',
+                          coordinates: farmer.location.coordinates as [number, number],
+                          avatar: avatar,
+                        }}
+                        zoom={15}
+                        height="400px"
+                        showAllLocations={false}
+                      />
+                      <div className="mt-4 p-4 bg-white rounded-lg border border-[#d4c9b0]">
+                        <div className="flex items-center gap-2 mb-2">
+                          <MapPin size={16} className="text-[#e86c2a]" />
+                          <h3 className="text-sm font-bold text-[#1a3d2b]">📍 Location Details</h3>
+                        </div>
+                        <p className="text-sm text-[#4a5a4e]">{farmer.location?.address || 'Address not available'}</p>
+                        {isOwner && (
+                          <Link 
+                            href={`/features/farmer/${farmer._id}/edit-location`}
+                            className="inline-block mt-3 text-[10px] font-bold text-[#e86c2a] hover:underline"
+                          >
+                            Update Location →
+                          </Link>
+                        )}
+                      </div>
+                    </>
+                  ) : (
+                    <div className="bg-white border border-[#d4c9b0] rounded-xl p-8 text-center">
+                      <MapPin size={48} className="mx-auto text-[#8a9a8e] mb-4" />
+                      <p className="text-text-muted mb-2">No location added yet</p>
+                      {isOwner && (
+                        <Link 
+                          href={`/features/farmer/${farmer._id}/edit-location`}
+                          className="inline-block mt-2 text-sm font-bold text-[#e86c2a] hover:underline"
+                        >
+                          Add Farm Location →
+                        </Link>
+                      )}
+                    </div>
+                  )}
                 </div>
               </div>
             )}
           </div>
         </div>
 
-        {/* Create Produce Modal */}
         {showCreateModal && (
           <div className="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4">
             <div className="bg-white rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">

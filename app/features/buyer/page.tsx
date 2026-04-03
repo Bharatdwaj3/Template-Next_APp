@@ -113,7 +113,7 @@ function BuyerCard({ buyer }: { buyer: Buyer }) {
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: 10 }}
-              className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-primary via-primary/95 to-transparent p-5 pt-16"
+              className="absolute inset-x-0 bottom-0 bg-linear-to-t from-primary via-primary/95 to-transparent p-5 pt-16"
             >
               {buyer.deliveryAddresses && buyer.deliveryAddresses.length > 0 && (
                 <div className="mb-3">

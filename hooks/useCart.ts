@@ -29,7 +29,6 @@ useEffect(() => {
   try {
     const stored = localStorage.getItem(CART_STORAGE_KEY);
     if (stored) {
-      // ✅ Safe: setState in a callback, not directly in effect body
       requestAnimationFrame(() => {
         setItems(JSON.parse(stored));
       });

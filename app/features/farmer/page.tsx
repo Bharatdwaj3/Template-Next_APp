@@ -27,7 +27,7 @@ interface Farmer {
 }
 
 function FarmerCard({ farmer }: { farmer: Farmer }) {
-  const { isFollowing, toggle } = useFollow("farmer", farmer._id);
+  const { isFollowing, toggle } = useFollow("farmer");
   const [isHovered, setIsHovered] = useState(false);
   const [isFollowingAnimating, setIsFollowingAnimating] = useState(false);
 
@@ -165,7 +165,7 @@ function FarmerCard({ farmer }: { farmer: Farmer }) {
               initial={{ opacity: 0, y: 10 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: 10 }}
-              className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-primary via-primary/95 to-transparent p-5 pt-16"
+              className="absolute inset-x-0 bottom-0 bg-linear-to-t from-primary via-primary/95 to-transparent p-5 pt-16"
             >
               {farmer.bio && (
                 <p className="text-[11px] text-text-inverse/90 mb-3 line-clamp-2 leading-relaxed">

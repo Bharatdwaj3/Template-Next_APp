@@ -7,7 +7,6 @@ import { Cart } from '@/components/Cart';
 import { useCartContext } from '@/hooks/useCartContext';
 import Navbar from '@/components/Navbar';
 
-// Internal component that uses cart context
 function GlobalCart() {
   const { items, isOpen, setIsOpen, addToCart, increment, decrement, remove } = useCartContext();
   

@@ -1,7 +1,6 @@
 // lib/api.ts
 import { getCookie, deleteCookie } from 'cookies-next';
 
-// Auto-switch based on NODE_ENV
 const API_URL = process.env.NODE_ENV === 'production'
   ? process.env.NEXT_PUBLIC_PROD_URL || 'http://localhost:5001'
   : process.env.NEXT_PUBLIC_DEV_URL || 'http://localhost:3000';

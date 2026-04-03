@@ -1,3 +1,5 @@
+
+
 // components/ResponsiveContact.tsx
 'use client';
 import { motion } from 'framer-motion';
@@ -36,7 +38,6 @@ export const ResponsiveContact = () => {
           <h2 className="text-4xl font-black tracking-tight">Get In Touch</h2>
         </div>
 
-        {/* Tabs */}
         <div className="flex justify-center gap-4 mb-12">
           {tabs.map((tab, i) => (
             <button
@@ -54,7 +55,7 @@ export const ResponsiveContact = () => {
         </div>
 
         <div className="grid grid-cols-12 gap-8">
-          {/* Features */}
+         
           <div className="col-span-12 lg:col-span-5 space-y-8">
             {features.map((f, i) => (
               <motion.div
@@ -75,8 +76,6 @@ export const ResponsiveContact = () => {
             ))}
           </div>
 
-          {/* Images */}
-         {/* Replace the Images Grid in your ResponsiveContact.tsx with this */}
 <div className="col-span-12 lg:col-span-7 grid grid-cols-2 gap-6">
   <div className="relative aspect-4/5 rounded-[2.5rem] overflow-hidden border border-white/10 shadow-2xl">
     <Image 

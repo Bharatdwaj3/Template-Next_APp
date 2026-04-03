@@ -107,11 +107,11 @@ export default function EditProfileModal({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-      {/* Backdrop */}
+    
       <div className="absolute inset-0 bg-primary/40 backdrop-blur-sm" onClick={onClose} />
       
       <div className="relative z-10 w-full max-w-lg bg-bg rounded-2xl shadow-2xl border border-border overflow-hidden max-h-[90vh] flex flex-col">
-        {/* Header */}
+       
         <div className="bg-primary px-6 py-4 flex items-center justify-between shrink-0">
           <div>
             <p className="text-[9px] font-black uppercase tracking-[0.4em] text-accent/50">Edit</p>
@@ -122,9 +122,9 @@ export default function EditProfileModal({
           </button>
         </div>
 
-        {/* Body */}
+      
         <div className="overflow-y-auto p-6 space-y-5 flex-1">
-          {/* Avatar upload */}
+          
           <div>
             <p className="text-[10px] font-black uppercase tracking-widest text-text-muted mb-2">Profile Image</p>
             <div className="flex items-center gap-4">
@@ -150,7 +150,7 @@ export default function EditProfileModal({
             </div>
           </div>
 
-          {/* farmName */}
+          
           {role === 'farmer' && (
             <div>
               <p className="text-[10px] font-black uppercase tracking-widest text-text-muted mb-2">Farm Name</p>
@@ -162,7 +162,7 @@ export default function EditProfileModal({
             </div>
           )}
 
-          {/* shopName */}
+         
           {role === 'grocer' && (
             <div>
               <p className="text-[10px] font-black uppercase tracking-widest text-text-muted mb-2">Shop Name</p>
@@ -174,7 +174,7 @@ export default function EditProfileModal({
             </div>
           )}
 
-          {/* bio */}
+          
           <div>
             <p className="text-[10px] font-black uppercase tracking-widest text-text-muted mb-2">Bio</p>
             <textarea
@@ -187,7 +187,7 @@ export default function EditProfileModal({
             <p className="text-[10px] text-text-muted mt-1 text-right">{bio.length}/1000</p>
           </div>
 
-          {/* location — grocer only */}
+        
           {role === 'grocer' && (
             <div>
               <p className="text-[10px] font-black uppercase tracking-widest text-text-muted mb-2">Location</p>
@@ -200,7 +200,7 @@ export default function EditProfileModal({
             </div>
           )}
 
-          {/* interests — farmer + grocer */}
+          
           {(role === 'farmer' || role === 'grocer') && (
             <div>
               <p className="text-[10px] font-black uppercase tracking-widest text-text-muted mb-2">
@@ -234,7 +234,8 @@ export default function EditProfileModal({
             </div>
           )}
 
-          {/* deliveryAddresses — buyer only */}
+          
+          
           {role === 'buyer' && (
             <div>
               <p className="text-[10px] font-black uppercase tracking-widest text-text-muted mb-2">Delivery Addresses</p>

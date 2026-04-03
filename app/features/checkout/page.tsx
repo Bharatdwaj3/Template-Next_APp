@@ -1,4 +1,5 @@
 // app/features/checkout/page.tsx
+
 'use client';
 
 import { useState, useEffect } from 'react';
@@ -36,19 +37,17 @@ export default function CheckoutPage() {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    // Get cart data from context or session storage
     if (cartItems.length > 0) {
       setItems(cartItems);
       setSubtotal(total);
     } else {
-      // Try to get from session storage
+
       const storedCart = sessionStorage.getItem('checkoutCart');
       const storedTotal = sessionStorage.getItem('checkoutTotal');
       if (storedCart && storedTotal) {
         setItems(JSON.parse(storedCart));
         setSubtotal(parseFloat(storedTotal));
       } else {
-        // No cart data, redirect to produce page
         router.push('/features/produce');
         return;
       }
@@ -57,7 +56,6 @@ export default function CheckoutPage() {
   }, [cartItems, total, router]);
 
   useEffect(() => {
-    // Pre-fill form with user data
     if (user) {
       setForm(prev => ({
         ...prev,
@@ -76,7 +74,6 @@ export default function CheckoutPage() {
       return;
     }
 
-    // Store delivery info for payment page
     sessionStorage.setItem('checkoutDeliveryInfo', JSON.stringify({
       name: form.name,
       phone: form.phone,
@@ -92,24 +89,23 @@ export default function CheckoutPage() {
       address: `${form.address}, ${form.city}, ${form.pincode}`,
     }));
 
-    // Navigate to payment page
     router.push('/features/checkout/payment');
   };
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-[var(--color-bg)] flex items-center justify-center pt-24">
-        <Loader2 className="animate-spin text-[var(--color-primary)]" size={40} />
+      <div className="min-h-screen bg-bg flex items-center justify-center pt-24">
+        <Loader2 className="animate-spin text-primary" size={40} />
       </div>
     );
   }
 
   if (items.length === 0) {
     return (
-      <div className="min-h-screen bg-[var(--color-bg)] pt-24 pb-16 px-6">
+      <div className="min-h-screen bg-bg pt-24 pb-16 px-6">
         <div className="max-w-4xl mx-auto text-center">
           <p className="text-[#8a9a8e] mb-4">Your cart is empty</p>
-          <Link href="/features/produce" className="text-[var(--color-cta)] hover:underline">
+          <Link href="/features/produce" className="text-cta hover:underline">
             Continue Shopping
           </Link>
         </div>
@@ -118,24 +114,24 @@ export default function CheckoutPage() {
   }
 
   return (
-    <div className="min-h-screen bg-[var(--color-bg)] pt-24 pb-16 px-6">
+    <div className="min-h-screen bg-bg pt-24 pb-16 px-6">
       <div className="max-w-6xl mx-auto">
-        {/* Header */}
+      
         <Link 
           href="/features/produce" 
-          className="inline-flex items-center gap-2 text-sm text-[#8a9a8e] hover:text-[var(--color-primary)] mb-6 transition-colors"
+          className="inline-flex items-center gap-2 text-sm text-[#8a9a8e] hover:text-primary mb-6 transition-colors"
         >
           <ArrowLeft size={16} /> Continue Shopping
         </Link>
         
-        <h1 className="text-4xl font-black text-[var(--color-primary)] mb-8">Checkout</h1>
+        <h1 className="text-4xl font-black text-primary mb-8">Checkout</h1>
 
         <div className="grid md:grid-cols-3 gap-8">
-          {/* Delivery Form */}
+         
           <div className="md:col-span-2">
-            <div className="bg-white rounded-xl p-6 shadow-sm border border-[var(--color-border)]">
-              <h2 className="text-lg font-black text-[var(--color-primary)] mb-4 flex items-center gap-2">
-                <MapPin size={20} className="text-[var(--color-cta)]" /> Delivery Address
+            <div className="bg-white rounded-xl p-6 shadow-sm border border-border">
+              <h2 className="text-lg font-black text-primary mb-4 flex items-center gap-2">
+                <MapPin size={20} className="text-cta" /> Delivery Address
               </h2>
               <div className="space-y-4">
                 <div className="grid grid-cols-2 gap-4">
@@ -143,49 +139,48 @@ export default function CheckoutPage() {
                     placeholder="Full name"
                     value={form.name}
                     onChange={(e) => setForm({ ...form, name: e.target.value })}
-                    className="w-full border border-[var(--color-border)] rounded-xl px-4 py-3 focus:outline-none focus:border-[var(--color-primary)] text-[var(--color-primary)] placeholder:text-[#a09880]"
+                    className="w-full border border-border rounded-xl px-4 py-3 focus:outline-none focus:border-primary text-primary placeholder:text-[#a09880]"
                   />
                   <input
                     placeholder="Phone number"
                     value={form.phone}
                     onChange={(e) => setForm({ ...form, phone: e.target.value })}
-                    className="w-full border border-[var(--color-border)] rounded-xl px-4 py-3 focus:outline-none focus:border-[var(--color-primary)] text-[var(--color-primary)] placeholder:text-[#a09880]"
+                    className="w-full border border-border rounded-xl px-4 py-3 focus:outline-none focus:border-primary text-primary placeholder:text-[#a09880]"
                   />
                 </div>
                 <input
                   placeholder="Street address"
                   value={form.address}
                   onChange={(e) => setForm({ ...form, address: e.target.value })}
-                  className="w-full border border-[var(--color-border)] rounded-xl px-4 py-3 focus:outline-none focus:border-[var(--color-primary)] text-[var(--color-primary)] placeholder:text-[#a09880]"
+                  className="w-full border border-border rounded-xl px-4 py-3 focus:outline-none focus:border-primary text-primary placeholder:text-[#a09880]"
                 />
                 <div className="grid grid-cols-2 gap-4">
                   <input
                     placeholder="City"
                     value={form.city}
                     onChange={(e) => setForm({ ...form, city: e.target.value })}
-                    className="w-full border border-[var(--color-border)] rounded-xl px-4 py-3 focus:outline-none focus:border-[var(--color-primary)] text-[var(--color-primary)] placeholder:text-[#a09880]"
+                    className="w-full border border-border rounded-xl px-4 py-3 focus:outline-none focus:border-primary text-primary placeholder:text-[#a09880]"
                   />
                   <input
                     placeholder="Pincode"
                     value={form.pincode}
                     onChange={(e) => setForm({ ...form, pincode: e.target.value })}
-                    className="w-full border border-[var(--color-border)] rounded-xl px-4 py-3 focus:outline-none focus:border-[var(--color-primary)] text-[var(--color-primary)] placeholder:text-[#a09880]"
+                    className="w-full border border-border rounded-xl px-4 py-3 focus:outline-none focus:border-primary text-primary placeholder:text-[#a09880]"
                   />
                 </div>
               </div>
               
-              <div className="flex items-center gap-3 bg-[var(--color-primary)]/5 rounded-xl p-4 mt-6 border border-[var(--color-primary)]/10">
-                <Truck size={16} className="text-[var(--color-primary)] shrink-0" />
+              <div className="flex items-center gap-3 bg-primary/5 rounded-xl p-4 mt-6 border border-primary/10">
+                <Truck size={16} className="text-primary shrink-0" />
                 <p className="text-[11px] text-[#4a5a4e]">
-                  Delivery within <span className="font-black text-[var(--color-primary)]">2–4 hours</span> for orders before 12pm.
+                  Delivery within <span className="font-black text-primary">2–4 hours</span> for orders before 12pm.
                 </p>
               </div>
             </div>
           </div>
 
-          {/* Order Summary */}
-          <div className="bg-white rounded-xl p-6 shadow-sm border border-[var(--color-border)] h-fit sticky top-24">
-            <h2 className="text-lg font-black text-[var(--color-primary)] mb-4">Order Summary</h2>
+          <div className="bg-white rounded-xl p-6 shadow-sm border border-border h-fit sticky top-24">
+            <h2 className="text-lg font-black text-primary mb-4">Order Summary</h2>
             <div className="space-y-3 max-h-64 overflow-y-auto">
               {items.map((item) => (
                 <div key={item.id} className="flex gap-3 text-sm">
@@ -195,14 +190,14 @@ export default function CheckoutPage() {
                     </div>
                   )}
                   <div className="flex-1">
-                    <p className="font-bold text-[var(--color-primary)]">{item.name}</p>
+                    <p className="font-bold text-primary">{item.name}</p>
                     <p className="text-[10px] text-[#8a9a8e]">{item.quantity} × ₹{item.price}</p>
                   </div>
                   <span className="font-bold">₹{(item.price * item.quantity).toFixed(0)}</span>
                 </div>
               ))}
             </div>
-            <div className="border-t border-[var(--color-border)] mt-4 pt-4 space-y-2">
+            <div className="border-t border-border mt-4 pt-4 space-y-2">
               <div className="flex justify-between">
                 <span className="text-[#8a9a8e]">Subtotal</span>
                 <span>₹{subtotal.toFixed(0)}</span>
@@ -211,16 +206,16 @@ export default function CheckoutPage() {
                 <span className="text-[#8a9a8e]">Delivery</span>
                 <span>₹{delivery}</span>
               </div>
-              <div className="flex justify-between pt-2 border-t border-[var(--color-border)] font-bold">
-                <span className="text-[var(--color-primary)]">Total</span>
-                <span className="text-xl text-[var(--color-cta)]">₹{grandTotal.toFixed(0)}</span>
+              <div className="flex justify-between pt-2 border-t border-border font-bold">
+                <span className="text-primary">Total</span>
+                <span className="text-xl text-cta">₹{grandTotal.toFixed(0)}</span>
               </div>
             </div>
 
             <button
               onClick={handleProceedToPayment}
               disabled={!isFormValid}
-              className="mt-6 w-full bg-[var(--color-primary)] text-[var(--color-primary-accent)] py-3 rounded-xl font-bold hover:bg-[var(--color-primary-hover)] transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              className="mt-6 w-full bg-primary text-(--color-primary-accent) py-3 rounded-xl font-bold hover:bg-primary-hover transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
             >
               Proceed to Payment →
             </button>

@@ -55,22 +55,22 @@ export default function OrdersPage() {
   };
 
   return (
-    <div className="min-h-screen bg-[var(--color-bg)] pt-24 pb-16 px-6">
+    <div className="min-h-screen bg-bg pt-24 pb-16 px-6">
       <div className="max-w-4xl mx-auto">
-        <h1 className="text-4xl font-black text-[var(--color-primary)] mb-8">My Orders</h1>
+        <h1 className="text-4xl font-black text-primary mb-8">My Orders</h1>
 
         {loading ? (
           <div className="flex justify-center py-12">
-            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[var(--color-primary)]" />
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary" />
           </div>
         ) : orders.length === 0 ? (
           <div className="bg-white rounded-xl p-12 text-center">
             <Package size={48} className="mx-auto text-[#8a9a8e] mb-4" />
-            <h2 className="text-xl font-black text-[var(--color-primary)] mb-2">No Orders Yet</h2>
+            <h2 className="text-xl font-black text-primary mb-2">No Orders Yet</h2>
             <p className="text-[#8a9a8e] mb-6">Start shopping to see your orders here</p>
             <Link
               href="/features/produce"
-              className="inline-block bg-[var(--color-primary)] text-[var(--color-primary-accent)] px-6 py-3 rounded-xl font-bold"
+              className="inline-block bg-primary text-(--color-primary-accent) px-6 py-3 rounded-xl font-bold"
             >
               Browse Produce
             </Link>
@@ -96,7 +96,7 @@ export default function OrdersPage() {
                   </div>
                 </div>
 
-                <div className="border-t border-[var(--color-border)] pt-4 mb-4">
+                <div className="border-t border-border pt-4 mb-4">
                   {order.items.slice(0, 3).map((item, idx) => (
                     <div key={idx} className="flex justify-between text-sm mb-2">
                       <span>{item.name} × {item.quantity}</span>
@@ -108,14 +108,14 @@ export default function OrdersPage() {
                   )}
                 </div>
 
-                <div className="flex justify-between items-center pt-4 border-t border-[var(--color-border)]">
+                <div className="flex justify-between items-center pt-4 border-t border-border">
                   <div>
                     <p className="text-sm text-[#8a9a8e]">Total Amount</p>
-                    <p className="text-xl font-black text-[var(--color-cta)]">₹{order.totalAmount.toFixed(0)}</p>
+                    <p className="text-xl font-black text-cta">₹{order.totalAmount.toFixed(0)}</p>
                   </div>
                   <Link
                     href={`/features/orders/${order.orderId}`}
-                    className="flex items-center gap-2 px-4 py-2 bg-[var(--color-bg)] rounded-xl text-sm font-bold hover:bg-[#e8e0d0] transition-colors"
+                    className="flex items-center gap-2 px-4 py-2 bg-bg rounded-xl text-sm font-bold hover:bg-[#e8e0d0] transition-colors"
                   >
                     <Eye size={16} /> View Details
                   </Link>

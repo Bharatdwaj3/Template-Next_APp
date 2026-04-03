@@ -121,7 +121,6 @@ export default function CheckoutPage() {
         <h1 className="text-4xl font-black text-primary mb-8">Checkout</h1>
 
         <div className="grid md:grid-cols-3 gap-8">
-          {/* Delivery Form */}
           <div className="md:col-span-2">
             <div className="bg-bg-alt rounded-xl p-6 shadow-sm border border-border">
               <h2 className="text-lg font-black text-primary mb-4 flex items-center gap-2">

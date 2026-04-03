@@ -31,7 +31,7 @@ export const CheckoutForm = ({ items }: CheckoutFormProps) => {
       <div className="mb-10">
         <p className="text-[10px] font-black uppercase tracking-[0.5em] text-cta mb-2">Almost there</p>
         <h1 className="text-4xl font-black text-primary uppercase tracking-tight">Checkout</h1>
-        <div className="w-12 h-[2px] mt-3" style={{ background: 'linear-gradient(90deg, var(--color-accent), transparent)' }} />
+        <div className="w-12 h-0.5 mt-3" style={{ background: 'linear-gradient(90deg, var(--color-accent), transparent)' }} />
       </div>
 
       <div className="flex items-center gap-0 mb-12">
@@ -104,7 +104,7 @@ export const CheckoutForm = ({ items }: CheckoutFormProps) => {
                   <input placeholder="CVV" value={form.cvv} onChange={(e) => update('cvv', e.target.value)} className={inputClass} />
                 </div>
                 <div className="flex items-center gap-3 bg-primary/5 rounded-xl p-4 border border-primary/10">
-                  <CheckCircle size={16} className="text-primary flex-shrink-0" />
+                  <CheckCircle size={16} className="text-primary shrink-0" />
                   <p className="text-[11px] text-text-green">
                     Your payment is secured with 256-bit SSL encryption.
                   </p>
@@ -151,7 +151,7 @@ export const CheckoutForm = ({ items }: CheckoutFormProps) => {
         <div className="col-span-5">
           <div className="bg-bg-alt border border-border rounded-2xl overflow-hidden sticky top-24">
             <div className="bg-primary px-5 py-4">
-              <div className="absolute top-0 left-0 right-0 h-[2px] bg-accent" />
+              <div className="absolute top-0 left-0 right-0 h-0.5 bg-accent" />
               <p className="text-[10px] font-black uppercase tracking-[0.4em] text-accent/60">Summary</p>
               <p className="text-lg font-black text-text-inverse uppercase tracking-tight">Order Details</p>
             </div>

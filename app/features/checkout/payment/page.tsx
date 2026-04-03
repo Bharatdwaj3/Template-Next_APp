@@ -1,4 +1,5 @@
 // app/features/checkout/payment/page.tsx
+
 'use client';
 
 import { useState, useEffect } from 'react';
@@ -22,7 +23,6 @@ export default function PaymentPage() {
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    // Get cart data
     if (cartItems.length > 0) {
       setItems(cartItems);
       setSubtotal(total);
@@ -35,7 +35,6 @@ export default function PaymentPage() {
       }
     }
 
-    // Get delivery info
     const storedDelivery = sessionStorage.getItem('checkoutDeliveryInfo');
     const storedCustomer = sessionStorage.getItem('checkoutCustomerInfo');
     
@@ -72,18 +71,18 @@ export default function PaymentPage() {
 
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-[var(--color-bg)] flex items-center justify-center pt-24">
-        <Loader2 className="animate-spin text-[var(--color-primary)]" size={40} />
+      <div className="min-h-screen bg-bg flex items-center justify-center pt-24">
+        <Loader2 className="animate-spin text-primary" size={40} />
       </div>
     );
   }
 
   if (!deliveryInfo) {
     return (
-      <div className="min-h-screen bg-[var(--color-bg)] pt-24 pb-16 px-6">
+      <div className="min-h-screen bg-bg pt-24 pb-16 px-6">
         <div className="max-w-4xl mx-auto text-center">
           <p className="text-[#8a9a8e] mb-4">No delivery information found</p>
-          <Link href="/features/checkout" className="text-[var(--color-cta)] hover:underline">
+          <Link href="/features/checkout" className="text-cta hover:underline">
             Go back to Checkout
           </Link>
         </div>
@@ -92,12 +91,11 @@ export default function PaymentPage() {
   }
 
   return (
-    <div className="min-h-screen bg-[var(--color-bg)] pt-24 pb-16 px-6">
+    <div className="min-h-screen bg-bg pt-24 pb-16 px-6">
       <div className="max-w-4xl mx-auto">
-        {/* Header */}
         <Link 
           href="/features/checkout" 
-          className="inline-flex items-center gap-2 text-sm text-[#8a9a8e] hover:text-[var(--color-primary)] mb-6 transition-colors"
+          className="inline-flex items-center gap-2 text-sm text-[#8a9a8e] hover:text-primary mb-6 transition-colors"
         >
           <ArrowLeft size={16} /> Back to Checkout
         </Link>
@@ -105,16 +103,15 @@ export default function PaymentPage() {
 
 
         <div className="grid md:grid-cols-2 gap-8">
-          {/* Payment Section */}
-          <div className="bg-white rounded-xl p-6 shadow-sm border border-[var(--color-border)]">
-            <h2 className="text-lg font-black text-[var(--color-primary)] mb-4">Payment</h2>
+          <div className="bg-white rounded-xl p-6 shadow-sm border border-border">
+            <h2 className="text-lg font-black text-primary mb-4">Payment</h2>
             
             {!user ? (
               <div className="text-center py-8">
                 <p className="text-[#4a5a4e] mb-4">Please login to complete payment</p>
                 <Link
                   href="/features/auth/login"
-                  className="inline-block bg-[var(--color-primary)] text-[var(--color-primary-accent)] px-6 py-2.5 rounded-xl font-bold"
+                  className="inline-block bg-primary text-(--color-primary-accent) px-6 py-2.5 rounded-xl font-bold"
                 >
                   Login to Continue
                 </Link>
@@ -155,9 +152,8 @@ export default function PaymentPage() {
             )}
           </div>
 
-          {/* Order Summary */}
-          <div className="bg-white rounded-xl p-6 shadow-sm border border-[var(--color-border)]">
-            <h2 className="text-lg font-black text-[var(--color-primary)] mb-4">Order Summary</h2>
+          <div className="bg-white rounded-xl p-6 shadow-sm border border-border">
+            <h2 className="text-lg font-black text-primary mb-4">Order Summary</h2>
             <div className="space-y-3 max-h-64 overflow-y-auto">
               {items.map((item) => (
                 <div key={item.id} className="flex justify-between text-sm">
@@ -169,7 +165,7 @@ export default function PaymentPage() {
                 </div>
               ))}
             </div>
-            <div className="border-t border-[var(--color-border)] mt-4 pt-4 space-y-2">
+            <div className="border-t border-border mt-4 pt-4 space-y-2">
               <div className="flex justify-between">
                 <span className="text-[#8a9a8e]">Subtotal</span>
                 <span>₹{subtotal}</span>
@@ -178,18 +174,17 @@ export default function PaymentPage() {
                 <span className="text-[#8a9a8e]">Delivery</span>
                 <span>₹{delivery}</span>
               </div>
-              <div className="flex justify-between pt-2 border-t border-[var(--color-border)] font-bold">
-                <span className="text-[var(--color-primary)]">Total</span>
-                <span className="text-xl text-[var(--color-cta)]">₹{grandTotal}</span>
+              <div className="flex justify-between pt-2 border-t border-border font-bold">
+                <span className="text-primary">Total</span>
+                <span className="text-xl text-cta">₹{grandTotal}</span>
               </div>
             </div>
           </div>
         </div>
 
-        {/* Delivery Info */}
-        <div className="mt-6 bg-white rounded-xl p-6 shadow-sm border border-[var(--color-border)]">
-          <h3 className="font-bold text-[var(--color-primary)] mb-2">Delivery Address</h3>
-          <p className="text-sm text-[var(--color-primary)]">{deliveryInfo.name}</p>
+        <div className="mt-6 bg-white rounded-xl p-6 shadow-sm border border-border">
+          <h3 className="font-bold text-primary mb-2">Delivery Address</h3>
+          <p className="text-sm text-primary">{deliveryInfo.name}</p>
           <p className="text-sm text-[#8a9a8e]">{deliveryInfo.address}</p>
           <p className="text-sm text-[#8a9a8e]">Phone: {deliveryInfo.phone}</p>
         </div>

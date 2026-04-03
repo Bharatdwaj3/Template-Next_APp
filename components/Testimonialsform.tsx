@@ -16,7 +16,7 @@ export const TestimonialsForm = () => {
   return (
     <section className="bg-bg py-20 px-6">
       <div className="max-w-6xl mx-auto grid grid-cols-12 gap-12 items-center">
-        {/* Left - Testimonial */}
+        
         <motion.div
           initial={{ x: -30, opacity: 0 }}
           whileInView={{ x: 0, opacity: 1 }}
@@ -36,7 +36,6 @@ export const TestimonialsForm = () => {
             </footer>
           </blockquote>
 
-          {/* Newsletter Form */}
           <form onSubmit={handleSubscribe} className="mt-12 space-y-4 max-w-md">
             <input
               type="text"

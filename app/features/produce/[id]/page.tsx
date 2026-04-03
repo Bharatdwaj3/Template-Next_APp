@@ -1,3 +1,4 @@
+
 // features/produce/[id]/page.tsx
 'use client';
 import { useEffect, useState } from 'react';
@@ -8,6 +9,7 @@ import { ArrowLeft, Package, Loader2, ShoppingBasket, Leaf, Star, Heart } from '
 import { useCartContext } from '@/hooks/useCartContext';
 import { useSavedProduce } from '@/hooks/useSavedProduce';
 import { api } from '@/lib/api';
+import { useVisitedProduce } from '@/hooks/useVisitedProduce';
 
 interface ProduceItem {
   _id: string;
@@ -34,12 +36,12 @@ export default function ProduceDetailPage() {
   const params = useParams();
   const router = useRouter();
   const { addToCart } = useCartContext();
+   const { markAsVisited } = useVisitedProduce(); 
   const [produce, setProduce] = useState<ProduceItem | null>(null);
   const [loading, setLoading] = useState(true);
   const [quantity, setQuantity] = useState(1);
   const [addingToCart, setAddingToCart] = useState(false);
 
-  // Save produce functionality
   const { isSaved, toggle: toggleSave } = useSavedProduce(params.id as string);
 
   useEffect(() => {
@@ -50,6 +52,7 @@ export default function ProduceDetailPage() {
         
         if (data.success && data.produce) {
           setProduce(data.produce);
+          markAsVisited(data.produce._id);
         } else {
           router.push('/features/produce');
         }
@@ -112,7 +115,6 @@ export default function ProduceDetailPage() {
 
         <div className="bg-bg-alt border border-border rounded-2xl overflow-hidden">
           <div className="grid md:grid-cols-2 gap-8 p-6 md:p-8">
-            {/* Image Section */}
             <div className="relative h-80 md:h-96 bg-bg rounded-xl overflow-hidden">
               {produce.img ? (
                 <Image
@@ -133,14 +135,13 @@ export default function ProduceDetailPage() {
               )}
             </div>
 
-            {/* Details Section */}
             <div>
               <div className="mb-4">
                 <div className="flex items-center justify-between mb-1">
                   <p className="text-[10px] font-black uppercase tracking-widest text-cta">
                     {produce.category}
                   </p>
-                  {/* Save Button */}
+
                   <button
                     onClick={toggleSave}
                     className={`flex items-center gap-2 px-3 py-1.5 rounded-full text-[10px] font-black uppercase tracking-wider transition-all ${

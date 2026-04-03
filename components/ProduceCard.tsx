@@ -96,7 +96,6 @@ export const ProduceCard = ({ produce, onAddToCart }: ProduceCardProps) => {
           )}
         </div>
 
-        {/* Badges */}
         <div className="absolute top-3 left-3 flex flex-col gap-2 z-10">
           {produce.isOrganic && (
             <span className="flex items-center gap-1 bg-primary text-accent text-[9px] font-black px-2.5 py-1 rounded-full">
@@ -115,7 +114,6 @@ export const ProduceCard = ({ produce, onAddToCart }: ProduceCardProps) => {
           )}
         </div>
 
-        {/* Quick View Button */}
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: isHovered ? 1 : 0 }}
@@ -126,19 +124,15 @@ export const ProduceCard = ({ produce, onAddToCart }: ProduceCardProps) => {
           </div>
         </motion.div>
 
-        {/* Content */}
         <div className="p-5">
-          {/* Category */}
           <p className="text-[9px] font-black uppercase tracking-widest text-cta mb-1">
             {produce.category}
           </p>
 
-          {/* Title */}
           <h3 className="text-lg font-black text-primary uppercase tracking-tight mb-2 line-clamp-1">
             {produce.name}
           </h3>
 
-          {/* Farmer Info */}
           <div className="flex items-center gap-2 mb-3">
             {produce.farmerId.avatar ? (
               <div className="relative w-5 h-5 rounded-full overflow-hidden">
@@ -161,7 +155,6 @@ export const ProduceCard = ({ produce, onAddToCart }: ProduceCardProps) => {
             </span>
           </div>
 
-          {/* Rating */}
           <div className="flex items-center gap-1 mb-3">
             <Star size={12} className="fill-cta text-cta" />
             <span className="text-sm font-bold text-cta">
@@ -172,7 +165,6 @@ export const ProduceCard = ({ produce, onAddToCart }: ProduceCardProps) => {
             </span>
           </div>
 
-          {/* Price and Add Button */}
           <div className="flex items-center justify-between">
             <div>
               <span className="text-2xl font-black text-cta">
@@ -214,7 +206,6 @@ export const ProduceCard = ({ produce, onAddToCart }: ProduceCardProps) => {
           </div>
         </div>
 
-        {/* Hover Overlay - Quick Review */}
         <AnimatePresence>
           {isHovered && (
             <motion.div
@@ -223,12 +214,10 @@ export const ProduceCard = ({ produce, onAddToCart }: ProduceCardProps) => {
               exit={{ opacity: 0, y: 10 }}
               className="absolute inset-x-0 bottom-0 bg-linear-to-t from-primary via-primary/95 to-transparent p-5 pt-16 z-10"
             >
-              {/* Description */}
               <p className="text-[11px] text-text-inverse/90 mb-3 line-clamp-2 leading-relaxed">
                 {produce.description || 'Fresh organic produce from local farms'}
               </p>
 
-              {/* Quick Stats */}
               <div className="flex items-center gap-4 mb-3">
                 <div className="flex items-center gap-1">
                   <Clock size={11} className="text-accent" />
@@ -244,7 +233,6 @@ export const ProduceCard = ({ produce, onAddToCart }: ProduceCardProps) => {
                 </div>
               </div>
 
-              {/* Stock Status */}
               <div className="flex items-center justify-between">
                 <div className={`text-[9px] font-black uppercase tracking-wider px-2 py-1 rounded ${
                   produce.stock > 10

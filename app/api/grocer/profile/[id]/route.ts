@@ -1,6 +1,5 @@
 // grocer/profile/[id]/route.ts
 
-
 import { NextRequest, NextResponse } from 'next/server';
 import Grocer from '@/model/grocer.model';
 import User from '@/model/user.model';

@@ -137,7 +137,10 @@ export default function BuyerProfilePage({
   const loadSavedProduceFromLocalStorage = async () => {
     try {
       setSavedProduceLoading(true);
-      const saved = localStorage.getItem("nerthus_savedProduce");
+      const currentUserId = localStorage.getItem('currentUserId'); 
+      const keyedData = localStorage.getItem(`nerthus_savedProduce_${currentUserId}`);
+      const fallbackData = localStorage.getItem('nerthus_savedProduce');
+      const saved = keyedData ?? fallbackData;
       const ids: string[] = saved ? JSON.parse(saved) : [];
       setSavedProduceIds(ids);
 

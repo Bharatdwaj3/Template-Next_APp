@@ -1,9 +1,11 @@
 // features/auth/login/page.tsx
 'use client';
 import { useState } from 'react';
+
 import { useAppDispatch } from '@/store/hooks';
 import { fetchUser } from '@/store/avatarSlice';
 import { motion } from 'framer-motion';
+import { rehydrate } from '@/store/contentSlice';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { Sprout, Eye, EyeOff, ArrowRight, Loader2, AlertCircle } from 'lucide-react';
@@ -49,8 +51,10 @@ export default function LoginPage() {
         setError(ERROR_CODES[data.code] ?? data.message ?? 'Something went wrong');
         return;
       }
-
+      localStorage.setItem('currentUserId', data.user.id);
+      dispatch(rehydrate());
       dispatch(fetchUser());
+      
       router.push(getRedirect(data.user.accountType, data.user.id));
     } catch (err) {
       console.error(err);
